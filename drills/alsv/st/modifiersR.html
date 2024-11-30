@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Trainer: Modifiers</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+        }
+        #container {
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        #start-button, #restart-button {
+            background-color: #007bff;
+            color: white;
+        }
+        #start-button:hover, #restart-button:hover {
+            background-color: #0056b3;
+        }
+        .word-button {
+            background-color: #f1f1f1;
+            color: black;
+        }
+        .word-button:hover {
+            background-color: #e0e0e0;
+        }
+        #sentence-builder {
+            margin: 20px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f0f8ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            overflow: hidden;
+            white-space: normal;
+            box-sizing: border-box;
+        }
+        #timer, #progress {
+            margin: 10px 0;
+        }
+        #word-buttons {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="start-screen">
+            <h2>Modifiers</h2>
+            <p>Practice sentence building! Click "Start" to begin.</p>
+            <button id="start-button">Start</button>
+        </div>
+        <div id="exercise-screen" style="display:none;">
+            <div id="timer"></div>
+            <div id="progress"></div>
+            <div id="sentence-builder"></div>
+            <div id="word-buttons"></div>
+        </div>
+        <div id="end-screen" style="display:none;">
+            <div id="final-time" style="margin-bottom: 10px;"></div>
+            <button id="restart-button">Restart</button>
+        </div>
+    </div>
+
+    <script>
+const sentences = [
+    "The museum was quite impressive with its ancient artifacts.",
+    "She's quite a talented pianist for her age.",
+    "That was quite an elegant solution to the problem.",
+    "I spend quite a lot of time reading books.",
+    "The weather is relatively mild for December.",
+    "The exam was fairly challenging, but manageable.",
+    "The sunset looks pretty spectacular tonight.",
+    "The hotel room was reasonably priced for its location.",
+    "This new version needs a bit more testing before release.",
+    "Today's crowd was a bit less rowdy than yesterday's.",
+    "Modern cars use a lot more technology than older models.",
+    "I'm drinking a lot less coffee than I used to."
+];
+
+
+
+        let shuffledSentences;
+        let currentSentenceIndex = 0;
+        let startTime;
+        let sentenceBuilder = [];
+        let timerInterval;
+
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const timerDisplay = document.getElementById('timer');
+        const progressDisplay = document.getElementById('progress');
+        const sentenceBuilderDisplay = document.getElementById('sentence-builder');
+        const wordButtonsContainer = document.getElementById('word-buttons');
+        const startScreen = document.getElementById('start-screen');
+        const exerciseScreen = document.getElementById('exercise-screen');
+        const endScreen = document.getElementById('end-screen');
+        const finalTimeDisplay = document.getElementById('final-time');
+
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', resetGame);
+
+        function startGame() {
+            resetGame();
+            startScreen.style.display = 'none';
+            exerciseScreen.style.display = 'block';
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 10);
+            loadNextSentence();
+        }
+
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = new Date(now - startTime);
+            const minutes = String(elapsed.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(elapsed.getUTCSeconds()).padStart(2, '0');
+            const milliseconds = String(Math.floor(elapsed.getUTCMilliseconds() / 10)).padStart(2, '0');
+            timerDisplay.textContent = `${minutes}:${seconds}:${milliseconds}`;
+        }
+
+        function loadNextSentence() {
+            if (currentSentenceIndex >= shuffledSentences.length) {
+                endGame();
+                return;
+            }
+            
+            sentenceBuilder = [];
+            sentenceBuilderDisplay.textContent = '';
+            let sentence = shuffledSentences[currentSentenceIndex];
+            const preserveFirstWordCapitalization = sentence.startsWith('_');
+
+            if (preserveFirstWordCapitalization) {
+                sentence = sentence.substring(1);
+            }
+
+            const words = sentence.replace(/[.?!]$/, '').split(' ');
+            const punctuation = sentence.match(/[?!]/);
+
+            wordButtonsContainer.innerHTML = '';
+
+            const shuffledWords = shuffleArray(words.slice());
+
+            shuffledWords.forEach((word, index) => {
+                const button = document.createElement('button');
+                const isFirstWord = (words.indexOf(word) === 0);
+                button.textContent = (isFirstWord && !preserveFirstWordCapitalization && word !== "I") ? word.toLowerCase() : word;
+
+                button.className = 'word-button';
+                button.addEventListener('click', () => addWordToSentence(word, button));
+                wordButtonsContainer.appendChild(button);
+            });
+
+            if (punctuation) {
+                const punctuationButton = document.createElement('button');
+                punctuationButton.textContent = punctuation[0];
+                punctuationButton.className = 'word-button';
+                punctuationButton.addEventListener('click', () => addPunctuationToSentence(punctuation[0], punctuationButton));
+                wordButtonsContainer.appendChild(punctuationButton);
+            }
+
+            updateProgress();
+        }
+
+        function addWordToSentence(word, button) {
+            const sentenceArray = shuffledSentences[currentSentenceIndex].replace(/[.?!]$/, '').split(' ');
+            const currentWord = sentenceArray[sentenceBuilder.length];
+
+            const sanitizedCurrentWord = currentWord.startsWith('_') ? currentWord.substring(1) : currentWord;
+
+            if (word.toLowerCase() === sanitizedCurrentWord.toLowerCase()) {
+                sentenceBuilder.push(sanitizedCurrentWord);
+                button.style.display = 'none';
+                sentenceBuilderDisplay.textContent = sentenceBuilder.join(' ');
+
+                if (sentenceBuilder.length === sentenceArray.length) {
+                    const punctuation = shuffledSentences[currentSentenceIndex].match(/[?!]/);
+                    if (!punctuation) {
+                        if (shuffledSentences[currentSentenceIndex].endsWith('.')) {
+                            sentenceBuilderDisplay.textContent += '.';
+                        }
+                        currentSentenceIndex++;
+                        setTimeout(loadNextSentence, 1000);
+                    }
+                }
+            }
+        }
+
+        function addPunctuationToSentence(punctuation, button) {
+            if (sentenceBuilder.length === shuffledSentences[currentSentenceIndex].replace(/[.?!]$/, '').split(' ').length) {
+                sentenceBuilderDisplay.textContent = sentenceBuilder.join(' ') + punctuation;
+                button.style.display = 'none';
+                currentSentenceIndex++;
+                setTimeout(loadNextSentence, 1000);
+            }
+        }
+
+        function updateProgress() {
+            progressDisplay.textContent = `Sentence: ${currentSentenceIndex + 1}/${shuffledSentences.length}`;
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            exerciseScreen.style.display = 'none';
+            endScreen.style.display = 'block';
+            finalTimeDisplay.textContent = `Total Time: ${timerDisplay.textContent}`;
+        }
+
+        function resetGame() {
+            clearInterval(timerInterval);
+            shuffledSentences = shuffleArray(sentences.slice());
+            currentSentenceIndex = 0;
+            timerDisplay.textContent = '00:00:00';
+            progressDisplay.textContent = '';
+            sentenceBuilderDisplay.textContent = '';
+            wordButtonsContainer.innerHTML = '';
+            startScreen.style.display = 'block';
+            exerciseScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
