@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор выгоды виртуальных карт</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 120px;
+            font-size: 16px;
+        }
+        .spending-input-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 5px;
+        }
+        .editable-value {
+            border: 1px solid #ddd;
+            background: white;
+            width: 70px;
+            text-align: center;
+            font-weight: bold;
+            color: #2980b9;
+            font-size: 1.1em;
+            outline: none;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        .editable-value:focus {
+            border-color: #2980b9;
+            box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
+        }
+        .slider-value {
+            font-weight: bold;
+            color: #2980b9;
+            font-size: 1.1em;
+        }
+        .result {
+            background: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        .chocopay {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .piplbot {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .break-even {
+            background: #fef9e7;
+            border-left: 4px solid #f39c12;
+            padding: 12px 15px;
+            border-radius: 0 6px 6px 0;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        .recommendation {
+            font-size: 1.2em;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .chocopay-rec {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .piplbot-rec {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .equal-rec {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1565c0;
+        }
+        .fee-group {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid #e9ecef;
+        }
+        .fee-group-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #e74c3c;
+        }
+        .courses-container {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+        }
+        .courses-container > div {
+            flex: 1;
+        }
+        .fees-container {
+            display: flex;
+            gap: 15px;
+        }
+        .fees-container > div {
+            flex: 1;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .card {
+                padding: 20px 15px;
+            }
+            input[type="number"] {
+                width: 100px;
+                padding: 6px 10px;
+            }
+            .spending-input-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .courses-container,
+            .fees-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Калькулятор выгоды виртуальных карт</h1>
+    
+    <div class="card">
+        <div class="input-group">
+            <label>Ежемесячные траты в долларах (USD):</label>
+            <div class="spending-input-container">
+                <input type="text" id="spending-value" class="editable-value" value="0,0">
+                <input type="range" id="spending-slider" min="0" max="500" step="0.1" value="0">
+            </div>
+        </div>
+        
+        <div class="input-group courses-container">
+            <div>
+                <label for="chocopay-rate">Курс Chocopay (RUB за 1 USD):</label>
+                <input type="number" id="chocopay-rate" step="0.01" value="112.60">
+            </div>
+            <div>
+                <label for="piplbot-rate">Курс ПиплБот (RUB за 1 USD):</label>
+                <input type="number" id="piplbot-rate" step="0.01" value="89.20">
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label for="transactions">Количество транзакций в месяц:</label>
+            <input type="number" id="transactions" min="0" step="1" value="1">
+        </div>
+        
+        <div class="fee-group">
+            <div class="fee-group-title">Комиссии ПиплБот:</div>
+            <div class="fees-container">
+                <div>
+                    <label for="piplbot-monthly-fee">Ежемесячная плата за обслуживание (USD):</label>
+                    <input type="number" id="piplbot-monthly-fee" step="0.01" min="0" value="5.00">
+                </div>
+                <div>
+                    <label for="piplbot-transaction-fee">Комиссия за транзакцию (USD):</label>
+                    <input type="number" id="piplbot-transaction-fee" step="0.01" min="0" value="0.70">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="result">
+            <div class="result-item">
+                <span>Chocopay:</span>
+                <span class="chocopay" id="chocopay-cost">0.00</span> RUB
+            </div>
+            <div class="result-item">
+                <span>ПиплБот:</span>
+                <span class="piplbot" id="piplbot-cost">0.00</span> RUB
+            </div>
+            <div class="result-item">
+                <span>Разница:</span>
+                <span id="difference">0.00</span> RUB
+            </div>
+        </div>
+        
+        <div class="recommendation" id="recommendation">
+            Переместите ползунок или кликните на сумму, чтобы увидеть рекомендацию
+        </div>
+        
+        <div class="break-even">
+            Точка безубыточности: <span id="break-even-value">0.00</span> USD
+        </div>
+    </div>
+    
+    <div class="info-box">
+        <div class="info-title">ℹ️ Как это работает:</div>
+        <p><strong>Chocopay:</strong> Стоимость = Траты в USD × Курс Chocopay</p>
+        <p><strong>ПиплБот:</strong> Стоимость = (Траты в USD + Плата за обслуживание + Комиссия за транзакцию × Кол-во транзакций) × Курс ПиплБот</p>
+        <p>Калькулятор учитывает все комиссии ПиплБот, кроме единоразовой платы за выпуск карты (845 руб.), так как она не влияет на ежемесячные расходы.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const spendingSlider = document.getElementById('spending-slider');
+            const spendingValueInput = document.getElementById('spending-value');
+            const chocopayRateInput = document.getElementById('chocopay-rate');
+            const piplbotRateInput = document.getElementById('piplbot-rate');
+            const transactionsInput = document.getElementById('transactions');
+            const piplbotMonthlyFeeInput = document.getElementById('piplbot-monthly-fee');
+            const piplbotTransactionFeeInput = document.getElementById('piplbot-transaction-fee');
+            const chocopayCostElement = document.getElementById('chocopay-cost');
+            const piplbotCostElement = document.getElementById('piplbot-cost');
+            const differenceElement = document.getElementById('difference');
+            const recommendationElement = document.getElementById('recommendation');
+            const breakEvenElement = document.getElementById('break-even-value');
+            
+            // Format number with comma as decimal separator
+            function formatNumber(value) {
+                return value.toString().replace('.', ',');
+            }
+            
+            // Parse number from input (handles comma and dot)
+            function parseNumber(value) {
+                if (!value) return 0;
+                return parseFloat(value.replace(',', '.'));
+            }
+            
+            // Handle spending value input changes
+            spendingValueInput.addEventListener('input', function() {
+                // Clean and format the input value
+                let cleaned = this.value.replace(/[^0-9,]/g, '');
+                cleaned = cleaned.replace(/,+/g, ',');
+                
+                // Handle leading comma
+                if (cleaned.startsWith(',')) {
+                    cleaned = '0' + cleaned;
+                }
+                
+                // Handle multiple commas
+                const parts = cleaned.split(',');
+                if (parts.length > 2) {
+                    cleaned = parts[0] + ',' + parts.slice(1).join('');
+                }
+                
+                this.value = cleaned;
+                
+                // Convert to number and validate
+                let numValue = parseNumber(cleaned);
+                if (isNaN(numValue)) numValue = 0;
+                if (numValue < 0) numValue = 0;
+                if (numValue > 500) {
+                    numValue = 500;
+                    this.value = '500';
+                }
+                
+                // Update slider
+                spendingSlider.value = numValue;
+                
+                // Calculate immediately
+                calculate();
+            });
+            
+            // Handle spending slider changes
+            spendingSlider.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                spendingValueInput.value = formatNumber(value.toFixed(1));
+                calculate();
+            });
+            
+            // Input event listeners for all other inputs
+            chocopayRateInput.addEventListener('input', calculate);
+            piplbotRateInput.addEventListener('input', calculate);
+            transactionsInput.addEventListener('input', calculate);
+            piplbotMonthlyFeeInput.addEventListener('input', calculate);
+            piplbotTransactionFeeInput.addEventListener('input', calculate);
+            
+            // Initial calculation and setup
+            calculateBreakEvenAndSetDefault();
+            calculate();
+            
+            function calculate() {
+                // Get input values
+                const spending = parseNumber(spendingValueInput.value);
+                const chocopayRate = parseFloat(chocopayRateInput.value) || 0;
+                const piplbotRate = parseFloat(piplbotRateInput.value) || 0;
+                const transactions = parseInt(transactionsInput.value) || 0;
+                const piplbotMonthlyFee = parseFloat(piplbotMonthlyFeeInput.value) || 0;
+                const piplbotTransactionFee = parseFloat(piplbotTransactionFeeInput.value) || 0;
+                
+                // Calculate costs
+                const chocopayCost = spending * chocopayRate;
+                const piplbotCost = (spending + piplbotMonthlyFee + piplbotTransactionFee * transactions) * piplbotRate;
+                
+                // Update displays
+                chocopayCostElement.textContent = chocopayCost.toFixed(2);
+                piplbotCostElement.textContent = piplbotCost.toFixed(2);
+                
+                // Calculate and display difference
+                const difference = chocopayCost - piplbotCost;
+                differenceElement.textContent = Math.abs(difference).toFixed(2);
+                differenceElement.style.color = difference > 0 ? '#e74c3c' : '#27ae60';
+                
+                // Determine recommendation
+                if (Math.abs(difference) < 0.5) {
+                    recommendationElement.textContent = "Обе карты примерно одинаковы по стоимости";
+                    recommendationElement.className = "recommendation equal-rec";
+                } else if (difference > 0) {
+                    recommendationElement.textContent = `Выгоднее ПиплБот на ${Math.abs(difference).toFixed(2)} RUB`;
+                    recommendationElement.className = "recommendation piplbot-rec";
+                } else {
+                    recommendationElement.textContent = `Выгоднее Chocopay на ${Math.abs(difference).toFixed(2)} RUB`;
+                    recommendationElement.className = "recommendation chocopay-rec";
+                }
+                
+                // Calculate and display current break-even point
+                updateBreakEvenDisplay();
+            }
+            
+            function updateBreakEvenDisplay() {
+                const chocopayRate = parseFloat(chocopayRateInput.value) || 0;
+                const piplbotRate = parseFloat(piplbotRateInput.value) || 0;
+                const transactions = parseInt(transactionsInput.value) || 0;
+                const piplbotMonthlyFee = parseFloat(piplbotMonthlyFeeInput.value) || 0;
+                const piplbotTransactionFee = parseFloat(piplbotTransactionFeeInput.value) || 0;
+                
+                let breakEvenValue = 0;
+                if (chocopayRate > piplbotRate && piplbotRate > 0) {
+                    const fixedCosts = (piplbotMonthlyFee + piplbotTransactionFee * transactions) * piplbotRate;
+                    breakEvenValue = fixedCosts / (chocopayRate - piplbotRate);
+                }
+                
+                // Display break-even value or message
+                if (chocopayRate <= piplbotRate || breakEvenValue < 0) {
+                    breakEvenElement.textContent = "Chocopay всегда выгоднее";
+                } else if (breakEvenValue > 500) {
+                    breakEvenElement.textContent = "ПиплБот всегда выгоднее при тратах до $500";
+                } else {
+                    breakEvenElement.textContent = breakEvenValue.toFixed(2);
+                }
+            }
+            
+            function calculateBreakEvenAndSetDefault() {
+                const chocopayRate = parseFloat(chocopayRateInput.value) || 112.60;
+                const piplbotRate = parseFloat(piplbotRateInput.value) || 89.20;
+                const transactions = parseInt(transactionsInput.value) || 1;
+                const piplbotMonthlyFee = parseFloat(piplbotMonthlyFeeInput.value) || 5.00;
+                const piplbotTransactionFee = parseFloat(piplbotTransactionFeeInput.value) || 0.70;
+                
+                let breakEven = 0;
+                if (chocopayRate > piplbotRate && piplbotRate > 0) {
+                    const fixedCosts = (piplbotMonthlyFee + piplbotTransactionFee * transactions) * piplbotRate;
+                    breakEven = fixedCosts / (chocopayRate - piplbotRate);
+                }
+                
+                // Clamp to slider range
+                breakEven = Math.max(0, Math.min(500, breakEven));
+                
+                // Set slider and input to break-even point (formatted with comma)
+                spendingSlider.value = breakEven;
+                spendingValueInput.value = formatNumber(breakEven.toFixed(1));
+            }
+        });
+    </script>
+</body>
+</html>
