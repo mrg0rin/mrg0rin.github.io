@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>✨ Magic Zoo ✨</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -13,9 +13,9 @@
   --sh:0 4px 16px rgba(0,0,0,.1);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Nunito',system-ui,sans-serif;background:linear-gradient(135deg,#E8E0F0 0%,#D0F0E8 50%,#FFE8D6 100%);min-height:100vh;display:flex;justify-content:center;color:var(--txt)}
-#app{width:100%;max-width:480px;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column}
-.scr{display:none;flex-direction:column;min-height:100vh;animation:fIn .3s ease}
+body{font-family:'Nunito',system-ui,sans-serif;background:linear-gradient(135deg,#E8E0F0 0%,#D0F0E8 50%,#FFE8D6 100%);height:100vh;height:100dvh;display:flex;justify-content:center;overflow:hidden;color:var(--txt)}
+#app{width:100%;max-width:480px;height:100vh;height:100dvh;position:relative;display:flex;flex-direction:column;overflow:hidden}
+.scr{display:none;flex-direction:column;height:100vh;height:100dvh;animation:fIn .3s ease;overflow:hidden}
 .scr.on{display:flex}
 @keyframes fIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .card{background:#fff;border-radius:var(--rad);box-shadow:var(--sh);padding:16px}
