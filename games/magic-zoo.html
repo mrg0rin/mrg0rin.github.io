@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>✨ Magic Zoo ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lav:#E8E0F0;--mint:#D0F0E8;--peach:#FFE8D6;--yell:#FFF8DC;
+  --coral:#FF6B6B;--teal:#4ECDC4;--sun:#FFD93D;--pur:#A78BFA;
+  --grn:#52C41A;--red:#FF4D4F;--txt:#333;--rad:16px;
+  --sh:0 4px 16px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Nunito',system-ui,sans-serif;background:linear-gradient(135deg,#E8E0F0 0%,#D0F0E8 50%,#FFE8D6 100%);min-height:100vh;display:flex;justify-content:center;color:var(--txt)}
+#app{width:100%;max-width:480px;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.scr{display:none;flex-direction:column;min-height:100vh;animation:fIn .3s ease}
+.scr.on{display:flex}
+@keyframes fIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:#fff;border-radius:var(--rad);box-shadow:var(--sh);padding:16px}
+.btn{border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:17px;font-weight:700;cursor:pointer;padding:12px 18px;min-height:48px;transition:transform .1s,box-shadow .1s;display:inline-flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation}
+.btn:hover{transform:scale(1.04)}.btn:active{transform:scale(.96)}
+.bpr{background:var(--coral);color:#fff}.btl{background:var(--teal);color:#fff}
+.bsn{background:var(--sun);color:#555}.bpu{background:var(--pur);color:#fff}.bgr{background:#ccc;color:#666}
+/* START */
+#s-start{align-items:center;justify-content:center;text-align:center;gap:18px;padding:24px 20px}
+.logo{font-size:34px;font-weight:800;color:var(--pur);text-shadow:0 2px 8px rgba(167,139,250,.3)}
+.zoo-row{font-size:44px;letter-spacing:2px}
+.nm-inp{width:100%;max-width:280px;border:3px solid var(--pur);border-radius:12px;font-family:'Nunito',sans-serif;font-size:18px;padding:12px 16px;text-align:center;outline:none;transition:border-color .2s}
+.nm-inp:focus{border-color:var(--teal)}
+@keyframes pGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,.4)}50%{box-shadow:0 0 0 14px rgba(255,107,107,0)}}
+/* MAP */
+#s-map{padding:16px;gap:14px}
+.mh{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.mtit{font-size:22px;font-weight:800;color:var(--pur)}
+.mpath{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;padding:4px 0}
+.lv-sec .lv-name{font-size:12px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.bl-row{display:flex;gap:14px;flex-wrap:wrap;padding:4px 4px 22px 6px;overflow:visible}
+.bdot{width:68px;height:68px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:26px;cursor:pointer;border:3px solid transparent;transition:transform .2s;position:relative;flex-shrink:0;user-select:none}
+.bdot:hover{transform:scale(1.1)}
+.bdot.done{background:var(--teal);border-color:#3aada5}
+.bdot.cur{background:var(--coral);border-color:#e55;animation:pulse 1.5s ease-in-out infinite}
+.bdot.lkd{background:#ddd;color:#aaa;cursor:not-allowed}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,.5)}50%{box-shadow:0 0 0 12px rgba(255,107,107,0)}}
+.bdot-stars{position:absolute;bottom:-18px;font-size:11px;white-space:nowrap}
+.mfoot{display:flex;gap:10px}
+.mfoot .btn{flex:1}
+/* EXERCISE */
+#s-ex{padding:0}
+.exh{background:#fff;padding:10px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);position:sticky;top:0;z-index:10;flex-shrink:0}
+.exh-info{flex:1;display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--coral)}
+.exh-prog{font-size:13px;color:#888;font-weight:700;white-space:nowrap}
+.ex-body{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.pb-wrap{height:8px;background:#eee;border-radius:4px;overflow:hidden;flex-shrink:0}
+.pb-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--pur));border-radius:4px;transition:width .4s}
+/* Pip */
+.pip{background:var(--yell);border-radius:12px;padding:10px 14px;font-size:15px;font-weight:600;display:flex;align-items:flex-start;gap:8px;border:2px solid var(--sun);transition:opacity .3s}
+.pip-ico{font-size:22px;flex-shrink:0}
+/* Mini cheatsheet */
+.mini-cs{background:var(--lav);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;flex-shrink:0}
+.mini-cs table{width:100%;border-collapse:collapse}
+.mini-cs td{padding:2px 4px}
+.cs-p{color:var(--pur)}.cs-a{color:#bbb}.cs-q{color:var(--coral);font-weight:800}
+/* Q card */
+.qcard{background:#fff;border-radius:var(--rad);box-shadow:var(--sh);padding:18px;text-align:center}
+.ch-card{display:inline-flex;flex-direction:column;align-items:center;background:var(--lav);border-radius:14px;padding:12px 24px;margin-bottom:10px}
+.ch-emo{font-size:52px}.ch-name{font-size:16px;font-weight:800;margin-top:2px}.ch-pro{font-size:13px;color:#888}
+.sub-lbl{font-size:14px;color:#888;font-weight:600;margin-bottom:8px}
+/* Options A */
+.opts-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.opts-g.solo{grid-template-columns:1fr}
+.opt-b{background:var(--lav);border:3px solid transparent;border-radius:12px;padding:14px 10px;font-size:17px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s;min-height:56px;font-family:'Nunito',sans-serif;touch-action:manipulation}
+.opt-b:hover{background:var(--mint);transform:scale(1.02)}
+.opt-b.ok{background:#d4f7d4;border-color:var(--grn);color:#1a7c1a}
+.opt-b.err{background:#ffdede;border-color:var(--red);animation:shk .4s}
+.opt-b.dis{pointer-events:none;opacity:.5}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+/* B sentence */
+.sent{font-size:20px;font-weight:700;line-height:1.8;text-align:center;margin-bottom:12px}
+.gap{display:inline-block;min-width:70px;border-bottom:3px dashed var(--pur);color:var(--pur);font-weight:800;padding:0 4px;transition:all .2s}
+.gap.ok{border-color:var(--grn);color:var(--grn);border-style:solid}
+.gap.err{border-color:var(--red);color:var(--red);border-style:solid}
+/* Pron buttons */
+.pbt-wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.pbt{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:17px;font-weight:700;cursor:pointer;transition:all .2s;min-height:48px;touch-action:manipulation}
+.pbt:hover{background:#3aada5;transform:scale(1.05)}.pbt:active{transform:scale(.95)}
+/* C */
+.hi-wd{background:var(--sun);border-radius:4px;padding:1px 5px;font-weight:800}
+.cor-btns{display:flex;gap:12px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.cor-btns .btn{flex:1;max-width:160px;font-size:15px}
+/* D */
+.d-slots{min-height:54px;background:#f5f5f5;border-radius:10px;border:2px dashed #ccc;display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;margin-bottom:10px;align-items:center;transition:background .3s}
+.d-bank{display:flex;flex-wrap:wrap;gap:8px;min-height:48px}
+.wchip{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;touch-action:manipulation}
+.wchip:hover{background:#3aada5;transform:scale(1.04)}.wchip:active{transform:scale(.96)}
+.wchip.in-s{background:var(--pur)}
+/* E memory */
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mcard{height:66px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;cursor:pointer;transition:all .3s;border:3px solid transparent;touch-action:manipulation}
+.mcard.fd{background:var(--pur);color:#fff}
+.mcard.fd::before{content:'⭐';font-size:20px}
+.mcard.fu{background:var(--lav);border-color:var(--pur);color:var(--pur)}
+.mcard.mt{background:#d4f7d4;border-color:var(--grn);color:#1a7c1a;cursor:default}
+.mv-lbl{font-size:13px;color:#aaa;text-align:center;font-weight:600;margin-bottom:6px}
+/* F */
+.rus-txt{font-size:19px;font-weight:700;color:#555;background:var(--mint);border-radius:10px;padding:12px 16px;text-align:center;margin-bottom:12px}
+/* RESULT */
+#s-res{align-items:center;justify-content:center;text-align:center;gap:18px;padding:24px 20px}
+.res-tit{font-size:28px;font-weight:800;color:var(--pur)}
+.res-stars{font-size:34px;letter-spacing:3px}
+.a-unlock{background:#fff;border-radius:var(--rad);box-shadow:var(--sh);padding:20px;width:100%;max-width:280px;animation:scUp .5s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes scUp{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.a-emo{font-size:64px}.a-name{font-size:20px;font-weight:800;margin-top:6px}.a-desc{font-size:13px;color:#666;margin-top:4px;line-height:1.5}
+.res-btns{display:flex;flex-direction:column;gap:10px;width:100%}
+.res-btns .btn{width:100%}
+/* COLLECTION */
+#s-col{padding:16px;gap:14px}
+.col-hd{display:flex;align-items:center;gap:10px}
+.col-tit{font-size:22px;font-weight:800;color:var(--pur);flex:1}
+.col-g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ccard{background:#fff;border-radius:12px;box-shadow:var(--sh);padding:12px 8px;text-align:center}
+.ccard.lkd{filter:grayscale(1);opacity:.45}
+.cc-emo{font-size:36px}.cc-name{font-size:12px;font-weight:800;margin-top:4px}
+.cc-desc{font-size:10px;color:#777;margin-top:3px;line-height:1.4}
+/* CHEATSHEET OVERLAY */
+#ov-cs{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center;padding:20px}
+#ov-cs.on{display:flex}
+.cs-card{background:#fff;border-radius:var(--rad);padding:20px;width:100%;max-width:400px;animation:scUp .3s ease;max-height:90vh;overflow-y:auto}
+.cs-tit{font-size:20px;font-weight:800;color:var(--pur);margin-bottom:14px;text-align:center}
+.cs-tbl{width:100%;border-collapse:collapse}
+.cs-tbl tr:nth-child(even){background:var(--lav)}
+.cs-tbl td{padding:7px 12px;font-size:16px;font-weight:600;border-radius:4px}
+.cs-per{color:var(--teal);font-size:17px}.cs-arr{color:#bbb}.cs-pos{color:var(--coral);font-size:18px;font-weight:800}
+.cs-rule{margin-top:12px;background:var(--mint);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:#444;line-height:1.6}
+/* Confetti */
+.cnf{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;z-index:200;animation:cfall 1.6s ease-in forwards}
+@keyframes cfall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+/* Streak badge */
+.str-badge{animation:ps .8s ease-in-out infinite;font-size:15px}
+@keyframes ps{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- START -->
+<div id="s-start" class="scr">
+  <div class="logo">✨ Magic Zoo ✨</div>
+  <div class="zoo-row">🐶🐱🦜🐰🐟🐧</div>
+  <div style="font-size:15px;color:#666;max-width:270px;font-weight:600;line-height:1.5">
+    Учись притяжательным местоимениям и собирай жителей зоопарка! 🌟
+  </div>
+  <div style="width:100%;max-width:280px">
+    <div style="font-size:14px;font-weight:700;color:#888;margin-bottom:8px">What's your name? / Как тебя зовут?</div>
+    <input class="nm-inp" id="nameIn" type="text" placeholder="Anna" maxlength="20">
+  </div>
+  <button class="btn bpr" id="startBtn" style="width:210px;font-size:20px;padding:16px" onclick="startGame()">
+    Let's go! 🚀
+  </button>
+  <div style="font-size:11px;color:#bbb">© Magic Zoo — English Trainer</div>
+</div>
+
+<!-- MAP -->
+<div id="s-map" class="scr">
+  <div class="mh">
+    <div class="mtit">🗺️ Magic Zoo</div>
+    <div style="font-weight:700;font-size:16px;color:var(--coral)">⭐ <span id="mStars">0</span></div>
+    <div style="font-size:13px;color:#aaa" id="mName"></div>
+  </div>
+  <div class="mpath" id="mPath"></div>
+  <div class="mfoot">
+    <button class="btn bsn" onclick="showCol()">🏆 Коллекция</button>
+    <button class="btn bpu" onclick="openCS()">📖 Шпаргалка</button>
+    <button class="btn bgr" onclick="resetPr()" style="flex:0;min-width:44px;padding:0">🗑️</button>
+  </div>
+</div>
+
+<!-- EXERCISE -->
+<div id="s-ex" class="scr">
+  <div class="exh">
+    <button class="btn" onclick="openCS()" style="padding:8px;min-height:36px;background:var(--lav);font-size:15px">📖</button>
+    <div class="exh-info">
+      <span id="exSt">⭐0</span>
+      <span id="exStr" class="str-badge"></span>
+    </div>
+    <span class="exh-prog" id="exPr">1/5</span>
+    <button class="btn" onclick="showMap()" style="padding:8px;min-height:36px;background:var(--lav);font-size:13px">🗺️</button>
+  </div>
+  <div class="ex-body" id="exBody">
+    <div class="pb-wrap"><div class="pb-fill" id="pbFill" style="width:0%"></div></div>
+    <div id="qArea"></div>
+    <div class="pip" id="pipEl" style="display:none">
+      <span class="pip-ico">🐧</span>
+      <span id="pipTxt"></span>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="s-res" class="scr">
+  <div class="res-tit" id="resTit">Block Complete! 🎉</div>
+  <div class="res-stars" id="resSt"></div>
+  <div id="resAn"></div>
+  <div class="res-btns" id="resBt"></div>
+</div>
+
+<!-- COLLECTION -->
+<div id="s-col" class="scr">
+  <div class="col-hd">
+    <button class="btn bgr" onclick="showMap()" style="padding:8px;min-height:38px">← Назад</button>
+    <div class="col-tit">🏆 Коллекция</div>
+    <div style="font-size:13px;color:#aaa"><span id="colCnt">0</span>/15</div>
+  </div>
+  <div id="colGrid" class="col-g"></div>
+</div>
+
+<!-- CHEATSHEET OVERLAY -->
+<div id="ov-cs">
+  <div class="cs-card">
+    <div class="cs-tit">📖 Шпаргалка смотрителя</div>
+    <table class="cs-tbl">
+      <tr>
+        <td><span class="cs-per">I 👤</span></td><td class="cs-arr">→</td><td><span class="cs-pos">my</span></td>
+        <td><span class="cs-per">you 👆</span></td><td class="cs-arr">→</td><td><span class="cs-pos">your</span></td>
+      </tr>
+      <tr>
+        <td><span class="cs-per">he 👦</span></td><td class="cs-arr">→</td><td><span class="cs-pos">his</span></td>
+        <td><span class="cs-per">she 👧</span></td><td class="cs-arr">→</td><td><span class="cs-pos">her</span></td>
+      </tr>
+      <tr>
+        <td><span class="cs-per">it 🐟</span></td><td class="cs-arr">→</td><td><span class="cs-pos">its</span></td>
+        <td><span class="cs-per">we 👫</span></td><td class="cs-arr">→</td><td><span class="cs-pos">our</span></td>
+      </tr>
+      <tr>
+        <td><span class="cs-per">they 👨‍👩‍👧</span></td><td class="cs-arr">→</td><td colspan="4"><span class="cs-pos">their</span></td>
+      </tr>
+    </table>
+    <div class="cs-rule">
+      💡 Посмотри, КТО делает действие:<br>
+      👦 Мальчик/он → <strong>his</strong> &nbsp;|&nbsp; 👧 Девочка/она → <strong>her</strong><br>
+      👨‍👩‍👧 Они/много → <strong>their</strong> &nbsp;|&nbsp; 👤 Я → <strong>my</strong><br>
+      👆 Ты → <strong>your</strong> &nbsp;|&nbsp; 👫 Мы → <strong>our</strong> &nbsp;|&nbsp; 🐟 Оно → <strong>its</strong>
+    </div>
+    <button onclick="closeCS()" style="display:block;width:100%;margin-top:14px;background:var(--coral);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;cursor:pointer">✕ Закрыть</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// =============================================
+// DATA
+// =============================================
+const ANIMALS = [
+  {id:'buddy',   e:'🐶',  n:'Buddy',       d:'Buddy is a dog. His ball is red. He loves his bone! 🦴'},
+  {id:'bella',   e:'🐱',  n:'Bella',       d:'Bella is a cat. Her eyes are green. She loves her fish! 🐟'},
+  {id:'coco',    e:'🦜',  n:'Coco',        d:'Coco is a parrot. His song is funny. He loves his toy! 🪀'},
+  {id:'daisy',   e:'🐰',  n:'Daisy',       d:'Daisy is a rabbit. Her food is an apple. She loves her home! 🍎'},
+  {id:'goldie',  e:'🐟',  n:'Goldie',      d:'Goldie is a fish. Its house is small. Its name is Goldie! 🏠'},
+  {id:'kittens', e:'🐱🐱',n:'The Kittens', d:'The kittens are small. Their mom is Bella. They love their mom!'},
+  {id:'puppies', e:'🐶🐶',n:'The Puppies', d:'The puppies are cute. Their toys are fun. They love their home!'},
+  {id:'parrots', e:'🦜🦜',n:'The Parrots', d:'The parrots can sing. Their songs are beautiful. They love their zoo!'},
+  {id:'pip',     e:'🐧',  n:'Pip',         d:'Pip is a penguin. His job is to help you! He loves his friends. 💙'},
+  {id:'milo',    e:'🐵',  n:'Milo',        d:'Milo is a monkey. His bananas are yellow. He loves his friends!'},
+  {id:'ellie',   e:'🐘',  n:'Ellie',       d:'Ellie is an elephant. Her nose is very long! She loves her food.'},
+  {id:'leo',     e:'🦁',  n:'Leo',         d:'Leo is a lion. His mane is big. He loves his zoo!'},
+  {id:'ruby',    e:'🦩',  n:'Ruby',        d:'Ruby is a flamingo. Her color is pink. She loves her home!'},
+  {id:'mrbrown', e:'👨',  n:'Mr. Brown',   d:'Mr. Brown is the zookeeper. His zoo is the best! He loves his animals.'},
+  {id:'trophy',  e:'🏆',  n:'Gold Trophy', d:'You completed the Magic Zoo! You are a star! ⭐⭐⭐'},
+];
+
+const B_UNLOCK = {
+  '1-1':'buddy','1-2':'bella','1-3':'coco','1-4':'daisy',
+  '2-1':'goldie','2-2':'kittens','2-3':'puppies','2-4':'parrots',
+  '3-1':'pip','3-2':'milo','3-3':'ellie','3-4':'leo',
+  '4-1':'ruby'
+};
+
+// Block order for "Next block" navigation
+const BLOCK_ORDER = [
+  {lv:1,bl:1},{lv:1,bl:2},{lv:1,bl:3},{lv:1,bl:4},
+  {lv:2,bl:1},{lv:2,bl:2},{lv:2,bl:3},{lv:2,bl:4},
+  {lv:3,bl:1},{lv:3,bl:2},{lv:3,bl:3},{lv:3,bl:4},
+  {lv:4,bl:1}
+];
+
+function getNextBlock(lv, bl){
+  const idx = BLOCK_ORDER.findIndex(b => b.lv===lv && b.bl===bl);
+  return (idx >= 0 && idx < BLOCK_ORDER.length - 1) ? BLOCK_ORDER[idx + 1] : null;
+}
+
+const PIP_OK = ['Great job! ⭐','You are a star! 🌟','Awesome! 🎉','Well done! 👏','Perfect! ✨','You got it! 💪','Amazing! 🌈','Super! 🦸'];
+
+// Questions data
+const QQ = [
+// LV1 BL1
+{id:1,lv:1,bl:1,t:'A',ch:{e:'👧',n:'Lisa',p:'she'},items:['his cat 🐱','her cat 🐱','their cat 🐱'],ans:'her cat 🐱',h1:'Lisa is a girl! Lisa → she → her! Try again!',h2:'The answer is "her". Lisa = she → her!'},
+{id:2,lv:1,bl:1,t:'A',ch:{e:'👦',n:'Tom',p:'he'},items:['his dog 🐶','her dog 🐶','my dog 🐶'],ans:'his dog 🐶',h1:'Tom is a boy! Tom → he → his! Try again!',h2:'The answer is "his". Tom = he → his!'},
+{id:3,lv:1,bl:1,t:'B',pts:['I have a dog. ','$','dog is big.'],ans:['My'],opts:['my','his','her'],h1:'I → my! Try again!',h2:'The answer is "My". I → my!'},
+{id:4,lv:1,bl:1,t:'B',pts:['You have a cat. ','$',' cat is funny.'],ans:['Your'],opts:['your','my','his'],h1:'you → your! Try again!',h2:'The answer is "Your". you → your!'},
+{id:5,lv:1,bl:1,t:'A',ch:{e:'🐶🐶',n:'The Puppies',p:'they'},items:['his ball 🟠','her ball 🟠','their ball 🟠'],ans:'their ball 🟠',h1:'The puppies → they → their! Try again!',h2:'The answer is "their". they → their!'},
+// LV1 BL2
+{id:6,lv:1,bl:2,t:'E',pairs:[['I','my'],['he','his'],['she','her'],['they','their']]},
+{id:7,lv:1,bl:2,t:'B',pts:['She has a parrot. ','$',' parrot is green.'],ans:['Her'],opts:['his','her','my'],h1:'she → her! Try again!',h2:'The answer is "Her". she → her!'},
+{id:8,lv:1,bl:2,t:'A',ch:{e:'👨',n:'Mr. Brown',p:'he'},items:['his hat 🎩','her hat 🎩','our hat 🎩'],ans:'his hat 🎩',h1:'Mr. Brown → he → his! Try again!',h2:'The answer is "his". he → his!'},
+{id:9,lv:1,bl:2,t:'B',pts:['We have a house. ','$',' house is big.'],ans:['Our'],opts:['our','their','your'],h1:'we → our! Try again!',h2:'The answer is "Our". we → our!'},
+{id:10,lv:1,bl:2,t:'B',pts:['He has a ball. ','$',' ball is red.'],ans:['His'],opts:['his','her','my'],h1:'he → his! Try again!',h2:'The answer is "His". he → his!'},
+// LV1 BL3
+{id:11,lv:1,bl:3,t:'A',ch:{e:'🐱',n:'Bella',p:'she'},items:['her fish 🐟','his fish 🐟','its fish 🐟'],ans:'her fish 🐟',h1:'Bella is a girl! she → her! Try again!',h2:'The answer is "her". Bella = she → her!'},
+{id:12,lv:1,bl:3,t:'B',pts:['They have a house. ','$',' house is small.'],ans:['Their'],opts:['our','his','their'],h1:'they → their! Try again!',h2:'The answer is "Their". they → their!'},
+{id:13,lv:1,bl:3,t:'B',pts:['It is a dog. ','$',' name is Buddy.'],ans:['Its'],opts:['its','his','her'],h1:'it → its! Try again!',h2:'The answer is "Its". it → its!'},
+{id:14,lv:1,bl:3,t:'A',ch:{e:'👤',n:'I (you!)',p:'I'},items:['your bag 🎒','my bag 🎒','our bag 🎒'],ans:'my bag 🎒',h1:'I → my! This is MY bag! Try again!',h2:'The answer is "my bag". I → my!'},
+{id:15,lv:1,bl:3,t:'E',pairs:[['you','your'],['it','its'],['we','our'],['she','her']]},
+// LV1 BL4
+{id:16,lv:1,bl:4,t:'B',pts:['She is Lisa. ','$',' cat is white.'],ans:['Her'],opts:['His','Her','My'],h1:'Lisa = she → her! Try again!',h2:'The answer is "Her". Lisa = she → her!'},
+{id:17,lv:1,bl:4,t:'A',ch:{e:'🐰',n:'Daisy',p:'she'},items:['her apple 🍎','his apple 🍎','their apple 🍎'],ans:'her apple 🍎',h1:'Daisy is a girl! she → her! Try again!',h2:'The answer is "her". Daisy = she → her!'},
+{id:18,lv:1,bl:4,t:'B',pts:['He is Tom. ','$',' dog is brown.'],ans:['His'],opts:['Her','His','Its'],h1:'Tom = he → his! Try again!',h2:'The answer is "His". Tom = he → his!'},
+{id:19,lv:1,bl:4,t:'B',pts:['I love ','$',' mom.'],ans:['my'],opts:['my','his','your'],h1:'I → my! Try again!',h2:'The answer is "my". I → my!'},
+{id:20,lv:1,bl:4,t:'A',ch:{e:'🦜',n:'Coco',p:'he'},items:['his toy 🪀','her toy 🪀','your toy 🪀'],ans:'his toy 🪀',h1:'Coco is a boy! he → his! Try again!',h2:'The answer is "his". Coco = he → his!'},
+// LV2 BL1
+{id:21,lv:2,bl:1,t:'B',pts:['Bella is a cat. ','$',' eyes are green.'],ans:['Her'],opts:['His','Her','Its','Their'],h1:'Bella is a girl! Bella = she → her! Try again!',h2:'The answer is "Her". Bella = she → her!'},
+{id:22,lv:2,bl:1,t:'B',pts:['Tom has a bike. ','$',' bike is blue.'],ans:['His'],opts:['His','Her','My','Your'],h1:'Tom is a boy! Tom = he → his! Try again!',h2:'The answer is "His". Tom = he → his!'},
+{id:23,lv:2,bl:1,t:'C',sent:'Lisa has a dog. She loves {her} dog.',hi:'her',ok:true,opts:['his','her','their','our'],hW:'Actually, this is correct! ✅ Lisa = she → her. 👍',h2:'It is correct! Lisa = she → her. ✅'},
+{id:24,lv:2,bl:1,t:'B',pts:['Mr. Brown is a zookeeper. ','$',' zoo is big.'],ans:['His'],opts:['Her','His','Our','Their'],h1:'Mr. Brown → he → his! Try again!',h2:'The answer is "His". Mr. Brown = he → his!'},
+{id:25,lv:2,bl:1,t:'B',pts:['The kittens are small. ','$',' mom is Bella.'],ans:['Their'],opts:['His','Her','Its','Their'],h1:'The kittens → they → their! Try again!',h2:'The answer is "Their". kittens = they → their!'},
+// LV2 BL2
+{id:26,lv:2,bl:2,t:'C',sent:'Tom has a ball. {His} ball is red.',hi:'His',ok:true,opts:['His','Her','Its','Their'],hW:'Actually, this is correct! ✅ Tom = he → his. 👍',h2:'It is correct! Tom = he → his. ✅'},
+{id:27,lv:2,bl:2,t:'B',pts:['Lisa and Tom love ','$',' school.'],ans:['their'],opts:['his','her','their','our'],h1:'Lisa AND Tom — two people! They → their! Try again!',h2:'The answer is "their". Lisa + Tom = they → their!'},
+{id:28,lv:2,bl:2,t:'B',pts:['Buddy is a dog. ','$',' bone is big.'],ans:['His'],opts:['Her','His','Its','Their'],h1:'Buddy is a boy dog! he → his! Try again!',h2:'The answer is "His". Buddy = he → his!'},
+{id:29,lv:2,bl:2,t:'C',sent:'Daisy is a rabbit. {His} food is an apple.',hi:'His',ok:false,cw:'Her',opts:['His','Her','Its','Their'],h1:'Daisy is a girl! Daisy = she → her, not "his"! Try again!',hW:'Daisy is a girl! Daisy = she → her, not "his"! Try again!',h2:'The answer is "Her". Daisy = she → her!'},
+{id:30,lv:2,bl:2,t:'B',pts:['Coco can sing. ','$',' song is funny.'],ans:['His'],opts:['His','Her','Its','Their'],h1:'Coco is a boy! he → his! Try again!',h2:'The answer is "His". Coco = he → his!'},
+// LV2 BL3
+{id:31,lv:2,bl:3,t:'A',ch:{e:'👧👦',n:'Lisa and Tom',p:'they'},items:['his mom 👩','her mom 👩','their mom 👩','our mom 👩'],ans:'their mom 👩',h1:'Lisa AND Tom → they → their! Try again!',h2:'The answer is "their mom". they → their!'},
+{id:32,lv:2,bl:3,t:'B',pts:['Mom and Dad have a car. ','$',' car is white.'],ans:['Their'],opts:['His','Our','Their','Her'],h1:'Mom AND Dad → they → their! Try again!',h2:'The answer is "Their". Mom + Dad = they → their!'},
+{id:33,lv:2,bl:3,t:'C',sent:'I have a brother. {My} brother is funny.',hi:'My',ok:true,opts:['My','His','Her','Their'],hW:'Actually, this is correct! ✅ I → my. 👍',h2:'It is correct! I → my. ✅'},
+{id:34,lv:2,bl:3,t:'B',pts:['You have a pen. ','$',' pen is blue.'],ans:['Your'],opts:['My','Your','His','Her'],h1:'you → your! Try again!',h2:'The answer is "Your". you → your!'},
+{id:35,lv:2,bl:3,t:'C',sent:'The parrots can sing. {His} songs are funny.',hi:'His',ok:false,cw:'Their',opts:['His','Her','Its','Their'],h1:'The parrots — many birds! They → their, not "his"! Try again!',hW:'The parrots — many birds! They → their, not "his"! Try again!',h2:'The answer is "Their". parrots = they → their!'},
+// LV2 BL4
+{id:36,lv:2,bl:4,t:'B',pts:['Goldie is a fish. ','$',' house is small.'],ans:['Its'],opts:['His','Her','Its','Their'],h1:'Goldie is a fish — it → its! Try again!',h2:'The answer is "Its". fish = it → its!'},
+{id:37,lv:2,bl:4,t:'C',sent:'Lisa likes {her} cat.',hi:'her',ok:true,opts:['his','her','its','their'],hW:'Actually, this is correct! ✅ Lisa = she → her. 👍',h2:'It is correct! Lisa = she → her. ✅'},
+{id:38,lv:2,bl:4,t:'B',pts:['We love ','$',' zoo.'],ans:['our'],opts:['my','your','our','their'],h1:'we → our! Try again!',h2:'The answer is "our". we → our!'},
+{id:39,lv:2,bl:4,t:'B',pts:['Tom can see ','$',' friends.'],ans:['his'],opts:['his','her','their','your'],h1:'Tom = he → his! Try again!',h2:'The answer is "his". Tom = he → his!'},
+{id:40,lv:2,bl:4,t:'C',sent:'We like {your} school.',hi:'your',ok:false,cw:'our',opts:['my','your','our','their'],h1:'"We" = мы, so we say OUR! Try again!',hW:'"We" = мы, so we say OUR! Try again!',h2:'The answer is "our". we → our!'},
+// LV3 BL1
+{id:41,lv:3,bl:1,t:'F',ru:'Лиза любит свою кошку.',en:'Lisa loves $ cat.',ans:['her'],opts:['my','his','her','their'],h1:'Лиза = Lisa = she → her! "Свою" = her! Try again!',h2:'The answer is "her". Lisa = she → her!'},
+{id:42,lv:3,bl:1,t:'F',ru:'Том любит свою собаку.',en:'Tom loves $ dog.',ans:['his'],opts:['my','his','her','their'],h1:'Том = Tom = he → his! "Свою" = his! Try again!',h2:'The answer is "his". Tom = he → his!'},
+{id:43,lv:3,bl:1,t:'D',words:['Lisa','loves','her','cat','.'],extras:['his','their'],ans:['Lisa','loves','her','cat','.']},
+{id:44,lv:3,bl:1,t:'F',ru:'Мы любим нашу маму.',en:'We love $ mom.',ans:['our'],opts:['my','our','their','your'],h1:'"Мы" = we → our! "Нашу" = our! Try again!',h2:'The answer is "our". we → our!'},
+{id:45,lv:3,bl:1,t:'B',pts:['Tom has a sister. ','$',' sister is kind. He loves ','$',' sister.'],ans:['His','his'],opts:['His','Her','Their'],h1:'Tom = he → his! Both blanks! Try again!',h2:'Answer: "His / his". Tom = he → his!'},
+// LV3 BL2
+{id:46,lv:3,bl:2,t:'F',ru:'Дети любят своего попугая.',en:'The children love $ parrot.',ans:['their'],opts:['his','her','our','their'],h1:'"Дети" = they → their! "Своего" = their! Try again!',h2:'The answer is "their". children = they → their!'},
+{id:47,lv:3,bl:2,t:'D',words:['Tom','and','Lisa','love','their','mom','.'],extras:['his','her'],ans:['Tom','and','Lisa','love','their','mom','.']},
+{id:48,lv:3,bl:2,t:'F',ru:'Я люблю свою школу.',en:'I love $ school.',ans:['my'],opts:['my','his','our','your'],h1:'"Я" = I → my! "Свою" = my! Try again!',h2:'The answer is "my". I → my!'},
+{id:49,lv:3,bl:2,t:'B',pts:['Lisa has a bag. ','$',' bag is yellow. Tom has a bag too. ','$',' bag is green.'],ans:['Her','His'],opts:['Her','His','Their','Our'],h1:'Lisa = she → her. Tom = he → his! Try again!',h2:'Answer: "Her / His". Lisa=she→her, Tom=he→his!'},
+{id:50,lv:3,bl:2,t:'D',words:['I','love','my','dog','.'],extras:['his','your'],ans:['I','love','my','dog','.']},
+// LV3 BL3
+{id:51,lv:3,bl:3,t:'F',ru:'Белла моет свой нос.',en:'Bella washes $ nose.',ans:['her'],opts:['his','her','its','their'],h1:'Белла = Bella = she → her! "Свой" = her! Try again!',h2:'The answer is "her". Bella = she → her!'},
+{id:52,lv:3,bl:3,t:'C',sent:'Tom and Lisa love {his} mom.',hi:'his',ok:false,cw:'their',opts:['his','her','their','our'],h1:'Tom AND Lisa → they → their, not "his"! Try again!',hW:'Tom AND Lisa → they → their, not "his"! Try again!',h2:'The answer is "their". Tom + Lisa = they → their!'},
+{id:53,lv:3,bl:3,t:'F',ru:'Ты любишь свою маму.',en:'You love $ mom.',ans:['your'],opts:['my','your','his','our'],h1:'"Ты" = you → your! "Свою" = your! Try again!',h2:'The answer is "your". you → your!'},
+{id:54,lv:3,bl:3,t:'D',words:['Buddy','likes','his','bone','.'],extras:['her','their'],ans:['Buddy','likes','his','bone','.']},
+{id:55,lv:3,bl:3,t:'B',pts:['Mr. Brown loves ','$',' animals. ','$',' zoo is the best!'],ans:['his','His'],opts:['his','her','their'],h1:'Mr. Brown = he → his! Both blanks! Try again!',h2:'Answer: "his / His". Mr. Brown = he → his!'},
+// LV3 BL4
+{id:56,lv:3,bl:4,t:'F',ru:'Щенки любят свои игрушки.',en:'The puppies love $ toys.',ans:['their'],opts:['his','its','our','their'],h1:'"Щенки" = puppies = they → their! "Свои" = their! Try again!',h2:'The answer is "their". puppies = they → their!'},
+{id:57,lv:3,bl:4,t:'D',words:['We','love','our','school','.'],extras:['my','their'],ans:['We','love','our','school','.']},
+{id:58,lv:3,bl:4,t:'F',ru:'Мистер Браун любит свой зоопарк.',en:'Mr. Brown loves $ zoo.',ans:['his'],opts:['my','his','her','their'],h1:'Мистер Браун = Mr. Brown = he → his! "Свой" = his! Try again!',h2:'The answer is "his". Mr. Brown = he → his!'},
+{id:59,lv:3,bl:4,t:'C',sent:'You must wash {your} hands.',hi:'your',ok:true,opts:['my','your','our','their'],hW:'Actually, this is correct! ✅ you → your. 👍',h2:'It is correct! you → your. ✅'},
+{id:60,lv:3,bl:4,t:'F',ru:'Коко любит свою песню.',en:'Coco loves $ song.',ans:['his'],opts:['his','her','its','their'],h1:'Коко = Coco = he → his! "Свою" = his! Try again!',h2:'The answer is "his". Coco = he → his!'},
+// LV4 BL1 (BOSS)
+{id:61,lv:4,bl:1,t:'F',ru:'Дейзи ест своё яблоко.',en:'Daisy eats $ apple.',ans:['her'],opts:['his','her','its','their'],h1:'Дейзи = Daisy = she → her! "Своё" = her! Try again!',h2:'The answer is "her". Daisy = she → her!'},
+{id:62,lv:4,bl:1,t:'C',sent:'Lisa and Tom wash {our} dog.',hi:'our',ok:false,cw:'their',opts:['his','her','our','their'],h1:'"Lisa and Tom" → they → their, not "our"! Try again!',hW:'"Lisa and Tom" → they → their, not "our"! Try again!',h2:'The answer is "their". Lisa + Tom = they → their!'},
+{id:63,lv:4,bl:1,t:'D',words:['The','kittens','love','their','mom','.'],extras:['her','his'],ans:['The','kittens','love','their','mom','.']},
+{id:64,lv:4,bl:1,t:'B',pts:['I have a friend. ','$',' friend is kind. I love ','$',' friend.'],ans:['My','my'],opts:['My','His','Their'],h1:'I → my! Both blanks are "my"! Try again!',h2:'Answer: "My / my". I → my!'},
+{id:65,lv:4,bl:1,t:'F',ru:'Голди любит свой домик.',en:'Goldie loves $ house.',ans:['its'],opts:['his','her','its','their'],h1:'Голди = Goldie — это рыбка! it → its! "Свой" = its! Try again!',h2:'The answer is "its". fish = it → its!'},
+{id:66,lv:4,bl:1,t:'E',pairs:[['I','my'],['you','your'],['he','his'],['she','her'],['it','its'],['they','their']]},
+{id:67,lv:4,bl:1,t:'C',sent:'Buddy likes {his} ball. Bella likes her fish.',hi:'his',ok:true,opts:['his','her','its','their'],hW:'Actually, this is correct! ✅ Buddy = he → his. 👍',h2:'It is correct! Buddy = he → his. ✅'},
+{id:68,lv:4,bl:1,t:'F',ru:'Я мою свою кошку.',en:'I wash $ cat.',ans:['my'],opts:['my','his','her','your'],h1:'"Я" = I → my! "Свою" = my! Try again!',h2:'The answer is "my". I → my!'},
+{id:69,lv:4,bl:1,t:'D',words:['You','must','read','your','book','.'],extras:['my','our'],ans:['You','must','read','your','book','.']},
+{id:70,lv:4,bl:1,t:'B',pts:['Tom can ride ','$',' bike. Lisa can ride ','$',' bike too. They love ','$',' bikes!'],ans:['his','her','their'],opts:['his','her','their','our'],h1:'Tom=he→his, Lisa=she→her, They→their! Try again!',h2:'Answers: "his / her / their". Tom=he→his, Lisa=she→her, They→their!'},
+];
+
+// =============================================
+// STATE
+// =============================================
+let S = {
+  name:'Player', totalStars:0, streak:0, bestStreak:0,
+  unlockedAnimals:[], mistakeIds:[], blockProgress:{},
+  // runtime:
+  qSet:[], qIdx:0, blockStars:0, blockMistakes:[],
+  curLv:1, curBl:1, isReplay:false,
+  gapIdx:0, attempts:0,
+  memFlipped:[], memMatched:[], memMoves:0, memLock:false, memCards:[], memQ:null, memHadMistake:false,
+  wordSlots:[],
+};
+
+function loadS(){
+  try{
+    const d=localStorage.getItem('mz2');
+    if(d) Object.assign(S,JSON.parse(d));
+  }catch(e){}
+}
+function saveS(){
+  try{
+    localStorage.setItem('mz2',JSON.stringify({
+      name:S.name,totalStars:S.totalStars,streak:S.streak,bestStreak:S.bestStreak,
+      unlockedAnimals:S.unlockedAnimals,mistakeIds:S.mistakeIds,blockProgress:S.blockProgress
+    }));
+  }catch(e){}
+}
+
+// =============================================
+// NAV
+// =============================================
+function showScr(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  const el=document.getElementById('s-'+id);
+  if(el) el.classList.add('on');
+}
+function showMap(){renderMap();showScr('map')}
+function showCol(){renderCol();showScr('col')}
+function openCS(){document.getElementById('ov-cs').classList.add('on')}
+function closeCS(){document.getElementById('ov-cs').classList.remove('on')}
+
+// =============================================
+// START
+// =============================================
+window.onload=()=>{
+  loadS();
+  document.getElementById('startBtn').style.animation='pGlow 2s infinite';
+  if(S.name&&S.name!=='Player'){
+    document.getElementById('nameIn').value=S.name;
+    showMap();
+  } else {
+    showScr('start');
+  }
+};
+
+function startGame(){
+  const n=document.getElementById('nameIn').value.trim();
+  S.name=n||'Player';
+  saveS();
+  showMap();
+}
+
+// =============================================
+// MAP
+// =============================================
+function getCurKey(){
+  for(const {lv,bl} of BLOCK_ORDER){
+    const k=`${lv}-${bl}`;
+    if(!S.blockProgress[k]?.done) return k;
+  }
+  return null;
+}
+
+function renderMap(){
+  document.getElementById('mStars').textContent=S.totalStars;
+  document.getElementById('mName').textContent=S.name+' 😊';
+  const curKey=getCurKey();
+  const LVS=[
+    {lv:1,name:'🌟 Level 1 — Welcome!',bls:4},
+    {lv:2,name:'🔧 Level 2 — Zoo Order',bls:4},
+    {lv:3,name:'📚 Level 3 — Big Day',bls:4},
+    {lv:4,name:'🏆 Level 4 — BOSS!',bls:1},
+  ];
+  const path=document.getElementById('mPath');
+  path.innerHTML='';
+  for(const {lv,name,bls} of LVS){
+    const sec=document.createElement('div');
+    sec.className='lv-sec';
+    sec.innerHTML=`<div class="lv-name">${name}</div>`;
+    const row=document.createElement('div');
+    row.className='bl-row';
+    for(let bl=1;bl<=bls;bl++){
+      const key=`${lv}-${bl}`;
+      const prog=S.blockProgress[key];
+      let status=(key===curKey)?'cur':(prog?.done?'done':'lkd');
+      const an=ANIMALS.find(a=>a.id===B_UNLOCK[key]);
+      const emo=an?[...an.e][0]:'❓';
+      const dot=document.createElement('div');
+      dot.className=`bdot ${status}`;
+      dot.textContent=emo;
+      dot.title=an?an.n:key;
+      if(prog?.stars){
+        const st=document.createElement('div');
+        st.className='bdot-stars';
+        st.textContent='⭐'.repeat(Math.min(prog.stars,3));
+        dot.appendChild(st);
+      }
+      if(status==='cur') dot.onclick=()=>startBlock(lv,bl,false);
+      else if(status==='done') dot.onclick=()=>startBlock(lv,bl,true);
+      row.appendChild(dot);
+    }
+    sec.appendChild(row);
+    path.appendChild(sec);
+  }
+}
+
+// =============================================
+// BLOCK
+// =============================================
+function startBlock(lv,bl,replay){
+  S.qSet=QQ.filter(q=>q.lv===lv&&q.bl===bl);
+  S.qIdx=0;S.blockStars=0;S.blockMistakes=[];
+  S.gapIdx=0;S.attempts=0;
+  S.curLv=lv;S.curBl=bl;S.isReplay=replay;
+  showScr('ex');
+  updateExHeader();
+  showQ();
+}
+
+function updateExHeader(){
+  document.getElementById('exSt').textContent=`⭐${S.totalStars}`;
+  const st=S.streak;
+  const el=document.getElementById('exStr');
+  el.textContent=st>=7?'🔥🔥🔥':st>=5?'🔥🔥':st>=3?'🔥':'';
+  const tot=S.qSet.length;
+  document.getElementById('exPr').textContent=`${S.qIdx+1}/${tot}`;
+  document.getElementById('pbFill').style.width=`${(S.qIdx/tot)*100}%`;
+}
+
+function showQ(){
+  S.attempts=0;S.gapIdx=0;
+  hidePip();
+  updateExHeader();
+  const q=S.qSet[S.qIdx];
+  const area=document.getElementById('qArea');
+  area.innerHTML='';
+  // Level 1: show mini cheatsheet inline
+  if(S.curLv===1){
+    const cs=document.createElement('div');
+    cs.className='mini-cs';
+    cs.innerHTML=`<table>
+      <tr><td class="cs-p">I</td><td class="cs-a">→</td><td class="cs-q">my</td><td class="cs-p">you</td><td class="cs-a">→</td><td class="cs-q">your</td></tr>
+      <tr><td class="cs-p">he</td><td class="cs-a">→</td><td class="cs-q">his</td><td class="cs-p">she</td><td class="cs-a">→</td><td class="cs-q">her</td></tr>
+      <tr><td class="cs-p">it</td><td class="cs-a">→</td><td class="cs-q">its</td><td class="cs-p">we</td><td class="cs-a">→</td><td class="cs-q">our</td></tr>
+      <tr><td class="cs-p">they</td><td class="cs-a">→</td><td colspan="4" class="cs-q">their</td></tr>
+    </table>`;
+    area.appendChild(cs);
+  }
+  const qc=document.createElement('div');
+  qc.className='qcard';qc.id='qc';
+  if(q.t==='A') rA(q,qc);
+  else if(q.t==='B') rB(q,qc);
+  else if(q.t==='C') rC(q,qc);
+  else if(q.t==='D') rD(q,qc);
+  else if(q.t==='E') rE(q,qc);
+  else if(q.t==='F') rF(q,qc);
+  area.appendChild(qc);
+  document.getElementById('exBody').scrollTop=0;
+}
+
+// =============================================
+// MECHANIC A
+// =============================================
+function rA(q,c){
+  c.innerHTML=`<div class="ch-card">
+    <div class="ch-emo">${q.ch.e}</div>
+    <div class="ch-name">${q.ch.n}</div>
+    <div class="ch-pro">(${q.ch.p})</div>
+  </div>
+  <div class="sub-lbl">Whose is it? / Чья это вещь?</div>`;
+  const g=document.createElement('div');
+  g.className='opts-g'+(q.items.length<=3?' solo':'');
+  q.items.forEach(item=>{
+    const b=document.createElement('button');
+    b.className='opt-b';b.textContent=item;
+    b.onclick=()=>hA(q,item,b,g);
+    g.appendChild(b);
+  });
+  c.appendChild(g);
+}
+function hA(q,ch,btn,g){
+  if(ch===q.ans){
+    btn.classList.add('ok');disG(g);
+    addStars(S.attempts===0?2:1);
+    S.streak++;if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+    pip(rPip(),false);
+    setTimeout(nextQ,1400);
+  } else {
+    btn.classList.add('err');S.attempts++;
+    addMist(q.id);
+    if(S.attempts>=2){
+      disG(g);
+      g.querySelectorAll('.opt-b').forEach(b=>{if(b.textContent===q.ans)b.classList.add('ok');});
+      S.streak=0;
+      pip(q.h2,false);
+      setTimeout(nextQ,2200);
+    } else {
+      pip(q.h1,true);
+      setTimeout(()=>btn.classList.remove('err'),450);
+    }
+    updateExHeader();
+  }
+}
+
+// =============================================
+// MECHANIC B
+// =============================================
+function rB(q,c){
+  const sd=document.createElement('div');
+  sd.className='sent';sd.id='bSent';
+  buildSentB(q,sd);
+  c.appendChild(sd);
+  const bw=document.createElement('div');
+  bw.className='pbt-wrap';bw.id='bWrap';
+  const seen=new Set();
+  q.opts.forEach(o=>{
+    const k=o.toLowerCase();
+    if(seen.has(k)) return;
+    seen.add(k);
+    const b=document.createElement('button');
+    b.className='pbt';b.textContent=o;
+    b.onclick=()=>hB(q,o,bw);
+    bw.appendChild(b);
+  });
+  c.appendChild(bw);
+}
+function buildSentB(q,el){
+  el.innerHTML='';
+  let gi=0;
+  q.pts.forEach(pt=>{
+    if(pt==='$'){
+      const sp=document.createElement('span');
+      sp.className='gap';sp.id=`g${gi}`;sp.textContent='___';
+      el.appendChild(sp);gi++;
+    } else {
+      el.appendChild(document.createTextNode(pt));
+    }
+  });
+}
+function hB(q,ch,bw){
+  const exp=q.ans[S.gapIdx];
+  const ok=ch.toLowerCase()===exp.toLowerCase();
+  if(ok){
+    const gap=document.getElementById(`g${S.gapIdx}`);
+    if(gap){gap.textContent=exp;gap.className='gap ok';}
+    S.gapIdx++;
+    if(S.gapIdx>=q.ans.length){
+      disB(bw);
+      addStars(S.attempts===0?2:1);
+      S.streak++;if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+      pip(rPip(),false);
+      setTimeout(nextQ,1400);
+    } else {
+      pip('Great! Fill the next blank! 🎯',false);
+      S.attempts=0;
+    }
+  } else {
+    S.attempts++;
+    addMist(q.id);
+    const gap=document.getElementById(`g${S.gapIdx}`);
+    if(gap){
+      gap.textContent=ch;gap.className='gap err';
+      setTimeout(()=>{gap.textContent='___';gap.className='gap';},500);
+    }
+    if(S.attempts>=2){
+      for(let i=S.gapIdx;i<q.ans.length;i++){
+        const g=document.getElementById(`g${i}`);
+        if(g){g.textContent=q.ans[i];g.className='gap ok';}
+      }
+      disB(bw);
+      S.streak=0;
+      pip(q.h2,false);
+      setTimeout(nextQ,2200);
+    } else {
+      pip(q.h1,true);
+    }
+    updateExHeader();
+  }
+}
+function disB(bw){bw.querySelectorAll('button').forEach(b=>b.style.pointerEvents='none');}
+
+// =============================================
+// MECHANIC C
+// =============================================
+function rC(q,c){
+  const sd=document.createElement('div');
+  sd.className='sent';
+  sd.innerHTML=q.sent.replace(/\{(\w+)\}/g,'<span class="hi-wd">$1</span>');
+  c.appendChild(sd);
+  const lbl=document.createElement('div');
+  lbl.style.cssText='font-size:13px;color:#aaa;text-align:center;margin-bottom:8px;font-weight:600';
+  lbl.textContent='Ошибка? / Wrong word?';
+  c.appendChild(lbl);
+  const btns=document.createElement('div');
+  btns.className='cor-btns';btns.id='cBtns';
+  const wB=document.createElement('button');
+  wB.className='btn bpr';wB.textContent='Wrong! ✏️';
+  wB.onclick=()=>hCWrong(q,c,btns);
+  const okB=document.createElement('button');
+  okB.className='btn btl';okB.textContent='Correct! ✅';
+  okB.onclick=()=>hCOk(q,btns);
+  btns.appendChild(wB);btns.appendChild(okB);
+  c.appendChild(btns);
+}
+function hCOk(q,btns){
+  if(q.ok){
+    btns.style.display='none';
+    addStars(S.attempts===0?2:1);
+    S.streak++;if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+    pip(rPip(),false);
+    setTimeout(nextQ,1400);
+  } else {
+    S.attempts++;addMist(q.id);
+    if(S.attempts>=2){
+      btns.style.display='none';
+      S.streak=0;pip(q.h2,false);
+      setTimeout(nextQ,2200);
+    } else {
+      pip(q.hW||q.h1,true);
+    }
+    updateExHeader();
+  }
+}
+function hCWrong(q,c,btns){
+  if(!q.ok){
+    btns.style.display='none';
+    const lbl2=document.createElement('div');
+    lbl2.style.cssText='font-size:13px;color:#888;text-align:center;margin-bottom:8px;font-weight:600';
+    lbl2.textContent='Choose the right word:';
+    c.appendChild(lbl2);
+    const ow=document.createElement('div');
+    ow.className='pbt-wrap';
+    q.opts.forEach(o=>{
+      const b=document.createElement('button');
+      b.className='pbt';b.textContent=o;
+      b.onclick=()=>hCRepl(q,o,b,ow);
+      ow.appendChild(b);
+    });
+    c.appendChild(ow);
+  } else {
+    S.attempts++;
+    if(S.attempts>=2){
+      btns.style.display='none';
+      addMist(q.id);S.streak=0;pip(q.h2,false);
+      setTimeout(nextQ,2200);
+    } else {
+      pip(q.hW||'Actually, this is correct! Try again! 👍',true);
+    }
+    updateExHeader();
+  }
+}
+function hCRepl(q,ch,btn,ow){
+  if(ch===q.cw){
+    btn.style.background='var(--grn)';
+    disB(ow);
+    addStars(S.attempts===0?2:1);
+    S.streak++;if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+    pip(rPip(),false);
+    setTimeout(nextQ,1400);
+  } else {
+    S.attempts++;
+    btn.style.animation='shk .4s';
+    setTimeout(()=>btn.style.animation='',450);
+    if(S.attempts>=2){
+      disB(ow);
+      ow.querySelectorAll('button').forEach(b=>{if(b.textContent===q.cw)b.style.background='var(--grn)';});
+      addMist(q.id);S.streak=0;pip(q.h2,false);
+      setTimeout(nextQ,2200);
+    } else {
+      pip(q.h1,true);
+    }
+    updateExHeader();
+  }
+}
+
+// =============================================
+// MECHANIC D
+// =============================================
+function rD(q,c){
+  const lbl=document.createElement('div');
+  lbl.style.cssText='font-size:14px;color:#888;text-align:center;margin-bottom:8px;font-weight:600';
+  lbl.textContent='Build the sentence! / Собери предложение! 🧩';
+  c.appendChild(lbl);
+  const slots=document.createElement('div');
+  slots.className='d-slots';slots.id='dSlots';
+  c.appendChild(slots);
+  const all=[...q.words,...(q.extras||[])];
+  shuf(all);
+  S.wordSlots=[];
+  const bank=document.createElement('div');
+  bank.className='d-bank';bank.id='dBank';
+  all.forEach(w=>bank.appendChild(mkChip(w,false)));
+  c.appendChild(bank);
+  const cw=document.createElement('div');
+  cw.style.cssText='display:flex;justify-content:center;margin-top:10px';
+  const cb=document.createElement('button');
+  cb.className='btn btl';cb.textContent='Check ✔️';
+  cb.onclick=()=>hD(q);
+  cw.appendChild(cb);c.appendChild(cw);
+}
+function mkChip(w,inSlot){
+  const c=document.createElement('button');
+  c.className='wchip'+(inSlot?' in-s':'');
+  c.textContent=w;
+  c.onclick=inSlot?()=>mFromSlot(c,w):()=>mToSlot(c,w);
+  return c;
+}
+function mToSlot(chip,w){
+  chip.remove();
+  S.wordSlots.push(w);
+  document.getElementById('dSlots').appendChild(mkChip(w,true));
+}
+function mFromSlot(chip,w){
+  chip.remove();
+  const i=S.wordSlots.indexOf(w);
+  if(i>-1) S.wordSlots.splice(i,1);
+  document.getElementById('dBank').appendChild(mkChip(w,false));
+}
+function hD(q){
+  const user=S.wordSlots.join(' ');
+  const correct=q.ans.join(' ');
+  if(user===correct){
+    document.getElementById('dSlots').style.background='#d4f7d4';
+    addStars(S.attempts===0?2:1);
+    S.streak++;if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+    pip(rPip(),false);
+    setTimeout(nextQ,1400);
+  } else {
+    S.attempts++;addMist(q.id);
+    const sl=document.getElementById('dSlots');
+    if(sl){sl.style.animation='shk .4s';setTimeout(()=>{if(sl)sl.style.animation='';},450);}
+    if(S.attempts>=2){
+      if(sl) sl.innerHTML=q.ans.map(w=>`<span class="wchip" style="background:var(--grn);cursor:default">${w}</span>`).join('');
+      S.streak=0;
+      pip(`The correct sentence: "${correct}"`,false);
+      setTimeout(nextQ,2500);
+    } else {
+      // Smart hint: check what kind of mistake was made
+      const sortedUser=[...S.wordSlots].sort().join('|');
+      const sortedAns=[...q.ans].sort().join('|');
+      if(S.wordSlots.length===q.ans.length && sortedUser===sortedAns){
+        // All correct words, just wrong order or punctuation
+        pip('You have the right words! 👍 Check the order — and don\'t forget the period at the end! 🔤 Try again!',true);
+      } else {
+        const pr=q.ans.find(w=>['my','your','his','her','its','our','their'].includes(w.toLowerCase()));
+        pip(`Almost! Make sure to use "${pr||'?'}" — and check the order of all the words! 💡 Try again!`,true);
+      }
+    }
+    updateExHeader();
+  }
+}
+
+// =============================================
+// MECHANIC E
+// =============================================
+function rE(q,c){
+  const lbl=document.createElement('div');
+  lbl.style.cssText='font-size:14px;color:#888;text-align:center;margin-bottom:6px;font-weight:600';
+  lbl.textContent='Find the pairs! / Найди пары! 🃏';
+  c.appendChild(lbl);
+  const mv=document.createElement('div');
+  mv.className='mv-lbl';mv.id='eMv';mv.textContent='Moves: 0';
+  c.appendChild(mv);
+  const cards=[];
+  q.pairs.forEach(([a,b])=>{
+    cards.push({txt:a,pk:`${a}|${b}`});
+    cards.push({txt:b,pk:`${a}|${b}`});
+  });
+  shuf(cards);
+  S.memCards=cards;S.memFlipped=[];S.memMatched=[];S.memMoves=0;S.memLock=false;S.memQ=q;
+  const g=document.createElement('div');
+  g.className='mgrid';
+  if(q.pairs.length===6) g.style.gridTemplateColumns='repeat(4,1fr)';
+  g.id='mGrd';
+  cards.forEach((card,i)=>{
+    const el=document.createElement('div');
+    el.className='mcard fd';
+    el.dataset.i=i;
+    el.onclick=()=>flipM(el,i);
+    g.appendChild(el);
+  });
+  c.appendChild(g);
+}
+function flipM(el,i){
+  if(S.memLock||S.memMatched.includes(i)||S.memFlipped.includes(i)) return;
+  el.classList.replace('fd','fu');
+  el.textContent=S.memCards[i].txt;
+  S.memFlipped.push(i);
+  if(S.memFlipped.length===2){
+    S.memMoves++;
+    document.getElementById('eMv').textContent=`Moves: ${S.memMoves}`;
+    const [i1,i2]=S.memFlipped;
+    if(S.memCards[i1].pk===S.memCards[i2].pk){
+      S.memMatched.push(i1,i2);
+      document.querySelectorAll(`[data-i="${i1}"],[data-i="${i2}"]`).forEach(e=>{
+        e.classList.remove('fu');e.classList.add('mt');
+      });
+      S.memFlipped=[];
+      pip(rPip(),false);
+      if(S.memMatched.length===S.memCards.length){
+        const pairs=S.memQ.pairs.length;
+        const st=S.memMoves<=pairs?2:S.memMoves<=pairs*2?1:0;
+        addStars(st);
+        S.streak++;
+        setTimeout(nextQ,900);
+      }
+    } else {
+      S.memLock=true;
+      setTimeout(()=>{
+        document.querySelectorAll(`[data-i="${i1}"],[data-i="${i2}"]`).forEach(e=>{
+          e.classList.replace('fu','fd');e.textContent='';
+        });
+        S.memFlipped=[];S.memLock=false;
+      },850);
+    }
+  }
+}
+
+// =============================================
+// MECHANIC F
+// =============================================
+function rF(q,c){
+  const ru=document.createElement('div');
+  ru.className='rus-txt';ru.textContent=q.ru;
+  c.appendChild(ru);
+  const sd=document.createElement('div');
+  sd.className='sent';
+  const parts=q.en.split('$');
+  sd.appendChild(document.createTextNode(parts[0]));
+  const gap=document.createElement('span');
+  gap.className='gap';gap.id='fGap';gap.textContent='___';
+  sd.appendChild(gap);
+  if(parts[1]) sd.appendChild(document.createTextNode(parts[1]));
+  c.appendChild(sd);
+  const bw=document.createElement('div');
+  bw.className='pbt-wrap';bw.id='fWrap';
+  q.opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='pbt';b.textContent=o;
+    b.onclick=()=>hF(q,o,bw);
+    bw.appendChild(b);
+  });
+  c.appendChild(bw);
+}
+function hF(q,ch,bw){
+  const ok=ch.toLowerCase()===q.ans[0].toLowerCase();
+  const gap=document.getElementById('fGap');
+  if(ok){
+    if(gap){gap.textContent=q.ans[0];gap.className='gap ok';}
+    disB(bw);
+    addStars(S.attempts===0?2:1);
+    S.streak++;if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+    pip(rPip(),false);
+    setTimeout(nextQ,1400);
+  } else {
+    S.attempts++;addMist(q.id);
+    if(gap){gap.textContent=ch;gap.className='gap err';setTimeout(()=>{gap.textContent='___';gap.className='gap';},500);}
+    if(S.attempts>=2){
+      if(gap){gap.textContent=q.ans[0];gap.className='gap ok';}
+      disB(bw);S.streak=0;pip(q.h2,false);
+      setTimeout(nextQ,2200);
+    } else {
+      pip(q.h1,true);
+    }
+    updateExHeader();
+  }
+}
+
+// =============================================
+// FLOW
+// =============================================
+function nextQ(){
+  S.qIdx++;
+  if(S.qIdx>=S.qSet.length) endBlock();
+  else showQ();
+}
+function addStars(n){S.blockStars+=n;S.totalStars+=n;updateExHeader();}
+function addMist(id){
+  if(!S.blockMistakes.includes(id)) S.blockMistakes.push(id);
+  if(!S.mistakeIds.includes(id)) S.mistakeIds.push(id);
+}
+function hidePip(){document.getElementById('pipEl').style.display='none';}
+function pip(msg,isErr){
+  const el=document.getElementById('pipEl');
+  el.style.display='flex';
+  el.style.background=isErr?'#fff0ee':'var(--yell)';
+  el.style.borderColor=isErr?'var(--coral)':'var(--sun)';
+  document.getElementById('pipTxt').textContent=msg;
+}
+function rPip(){return PIP_OK[Math.floor(Math.random()*PIP_OK.length)];}
+
+// =============================================
+// END BLOCK
+// =============================================
+function endBlock(){
+  const lv=S.curLv,bl=S.curBl,key=`${lv}-${bl}`;
+  const maxSt=S.qSet.length*2;
+  const pct=S.blockStars/maxSt;
+  const st3=pct>=.85?3:pct>=.5?2:pct>0?1:0;
+  const prev=S.blockProgress[key];
+  S.blockProgress[key]={done:true,stars:Math.max(st3,prev?.stars||0)};
+  const aid=B_UNLOCK[key];
+  if(aid&&!S.unlockedAnimals.includes(aid)) S.unlockedAnimals.push(aid);
+  if(lv===4&&bl===1){
+    ['mrbrown','trophy'].forEach(id=>{if(!S.unlockedAnimals.includes(id))S.unlockedAnimals.push(id);});
+  }
+  saveS();
+  showResult(lv,bl,st3,aid);
+}
+
+function showResult(lv,bl,st3,aid){
+  showScr('res');
+  const isBoss=(lv===4&&bl===1);
+  document.getElementById('resTit').textContent=isBoss?'🏆 BOSS COMPLETE! 🎉':'Block Complete! 🎉';
+  document.getElementById('resSt').textContent='⭐'.repeat(st3)+'☆'.repeat(3-st3);
+
+  // Unlocked animal card
+  const an=ANIMALS.find(a=>a.id===aid);
+  const div=document.getElementById('resAn');
+  if(an&&S.unlockedAnimals.includes(aid)){
+    div.innerHTML=`<div class="a-unlock">
+      <div style="font-size:13px;color:#aaa;font-weight:600">🎉 New friend unlocked!</div>
+      <div class="a-emo">${an.e}</div>
+      <div class="a-name">${an.n}</div>
+      <div class="a-desc">${an.d}</div>
+    </div>`;
+    confetti();
+  } else div.innerHTML='';
+
+  // Buttons
+  const bt=document.getElementById('resBt');
+  bt.innerHTML='';
+
+  // "Next block" button — goes directly to next block (or collection if boss)
+  const nb=document.createElement('button');
+  nb.className='btn bpr';
+  if(isBoss){
+    nb.textContent='See Collection 🏆';
+    nb.onclick=()=>showCol();
+  } else {
+    const nextBlk=getNextBlock(lv,bl);
+    if(nextBlk){
+      nb.textContent='Next block →';
+      nb.onclick=()=>startBlock(nextBlk.lv,nextBlk.bl,false);
+    } else {
+      nb.textContent='See Collection 🏆';
+      nb.onclick=()=>showCol();
+    }
+  }
+  bt.appendChild(nb);
+
+  // "Practice mistakes" — show whenever there were mistakes in this block
+  if(S.blockMistakes.length>0){
+    const pm=document.createElement('button');
+    pm.className='btn bsn';pm.textContent='Practice mistakes 🔄';
+    pm.onclick=()=>practMistakes();
+    bt.appendChild(pm);
+  }
+
+  // "Back to map" always available
+  const m=document.createElement('button');
+  m.className='btn bgr';m.textContent='Back to map 🗺️';
+  m.onclick=()=>showMap();
+  bt.appendChild(m);
+}
+
+function practMistakes(){
+  const ids=S.blockMistakes.slice(0,3);
+  S.qSet=QQ.filter(q=>ids.includes(q.id));
+  if(!S.qSet.length){showMap();return;}
+  S.qIdx=0;S.blockStars=0;S.blockMistakes=[];
+  S.gapIdx=0;S.attempts=0;S.isReplay=true;
+  showScr('ex');updateExHeader();showQ();
+}
+
+// =============================================
+// COLLECTION
+// =============================================
+function renderCol(){
+  document.getElementById('colCnt').textContent=S.unlockedAnimals.length;
+  const g=document.getElementById('colGrid');
+  g.innerHTML='';
+  ANIMALS.forEach(a=>{
+    const ul=S.unlockedAnimals.includes(a.id);
+    const c=document.createElement('div');
+    c.className='ccard'+(ul?'':' lkd');
+    c.innerHTML=`<div class="cc-emo">${ul?a.e:'❓'}</div>
+      <div class="cc-name">${ul?a.n:'???'}</div>
+      ${ul?`<div class="cc-desc">${a.d}</div>`:''}`;
+    g.appendChild(c);
+  });
+}
+
+// =============================================
+// RESET
+// =============================================
+function resetPr(){
+  if(confirm('Сбросить весь прогресс?\nReset all progress?')){
+    localStorage.removeItem('mz2');location.reload();
+  }
+}
+
+// =============================================
+// UTILS
+// =============================================
+function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+function disG(g){g.querySelectorAll('button').forEach(b=>b.classList.add('dis'));}
+function confetti(){
+  const cols=['#FF6B6B','#4ECDC4','#FFD93D','#A78BFA','#52C41A','#FF9F1C'];
+  for(let i=0;i<28;i++){
+    const el=document.createElement('div');
+    el.className='cnf';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${cols[~~(Math.random()*cols.length)]};animation-delay:${Math.random()*.7}s`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2200);
+  }
+}
+</script>
+</body>
+</html>
