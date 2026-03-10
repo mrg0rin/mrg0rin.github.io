@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ледяное Королевство</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #E8F4F8; --card: #fff; --accent: #7EB6D8; --accentH: #6AA9CE;
+  --ok: #A8E6CF; --err: #FFAAA5; --txt: #4A4A4A; --muted: #8A8A8A;
+  --gold: #FFD93D; --ice: #D4E5ED; --sh: rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+@media(max-width:359px){html{font-size:14px}}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+#app{max-width:500px;margin:0 auto;min-height:100vh;position:relative}
+
+/* animations */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-7px)}80%{transform:translateX(7px)}}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.13)}100%{transform:scale(1)}}
+@keyframes bounceIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
+@keyframes pulseDot{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes starPop{0%{transform:scale(0)rotate(-20deg);opacity:0}60%{transform:scale(1.35)rotate(5deg);opacity:1}100%{transform:scale(1)rotate(0);opacity:1}}
+@keyframes snowFall{0%{transform:translateY(-40px)rotate(0);opacity:1}100%{transform:translateY(110vh)rotate(720deg);opacity:0}}
+@keyframes pulseHL{0%,100%{background:#EEF6FF}50%{background:#d6eefa}}
+
+/* layout */
+.screen{min-height:100vh;padding:20px 16px;display:flex;flex-direction:column;animation:fadeIn .3s ease}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;border-radius:24px;border:none;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;width:100%}
+.btn-p{background:var(--accent);color:#fff}
+.btn-p:hover{background:var(--accentH)}
+.btn-o{background:transparent;color:var(--accent);border:2.5px solid var(--accent)}
+.btn-o:hover{background:var(--accent);color:#fff}
+.btn-t{background:transparent;color:var(--muted);font-weight:600;font-size:.9rem}
+.btn:disabled{opacity:.55;cursor:default}
+
+/* ── START ── */
+.start-screen{align-items:center;justify-content:center;text-align:center;gap:16px;background:linear-gradient(180deg,var(--bg) 0%,#fff 100%)}
+.s-snow{font-size:80px;line-height:1}
+.s-title{font-size:28px;font-weight:700}
+.s-sub{font-size:16px;color:var(--muted)}
+.s-btns{display:flex;flex-direction:column;gap:12px;width:100%;max-width:280px;margin-top:8px}
+.s-prog{font-size:.82rem;color:var(--muted);margin-top:4px}
+
+/* ── MAP ── */
+.map-screen{padding-top:60px;position:relative}
+.map-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:24px}
+.map-list{display:flex;flex-direction:column;padding:0 12px}
+.map-row{display:flex;align-items:center;gap:16px;padding:10px 8px;border-radius:12px;transition:background .2s;position:relative}
+.map-row.avail{cursor:pointer}
+.map-row.avail:hover{background:rgba(0,0,0,.03)}
+.map-dot{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;z-index:1}
+.map-dot.done{background:var(--accent);color:#fff}
+.map-dot.cur{background:var(--accent);color:#fff;animation:pulseDot 1.8s ease infinite}
+.map-dot.lock{background:var(--ice);color:var(--muted)}
+.map-line{position:absolute;left:39px;top:100%;width:2px;height:28px;border-left:2px dashed var(--ice);z-index:0}
+.map-info{flex:1}
+.map-lname{font-weight:700;font-size:.95rem}
+.map-stars{font-size:.82rem;color:var(--gold)}
+.map-char{font-size:30px}
+
+/* ── TASK ── */
+.task-screen{gap:12px}
+.topbar{display:flex;align-items:center;gap:10px}
+.back-sm{width:36px;height:36px;border-radius:50%;border:none;background:none;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.back-sm:hover{background:rgba(0,0,0,.06)}
+.pbw{flex:1;height:8px;background:var(--ice);border-radius:4px;overflow:hidden}
+.pbf{height:100%;background:var(--accent);border-radius:4px;transition:width .5s ease}
+.sc-badge{font-weight:700;color:var(--accent);font-size:.88rem;white-space:nowrap}
+.stk-badge{font-size:.85rem;color:var(--gold);font-weight:700;white-space:nowrap}
+
+.snowjoke{display:flex;align-items:flex-start;gap:10px}
+.sj-face{font-size:36px;flex-shrink:0}
+.sj-txt{background:#fff;border-radius:12px 12px 12px 2px;padding:10px 14px;font-size:.88rem;line-height:1.4;box-shadow:0 2px 6px var(--sh);max-width:80%;animation:slideUp .3s ease}
+
+.tcard{background:#fff;border-radius:16px;padding:20px;box-shadow:0 3px 12px var(--sh);animation:slideUp .3s ease}
+.char-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.char-em{font-size:48px;line-height:1}
+.char-nm{font-weight:700}
+.tctx{font-size:.85rem;color:var(--muted);margin-bottom:8px}
+.trus{font-size:1.05rem;font-weight:600;margin-bottom:10px}
+.teng{font-size:1.22rem;font-weight:700;margin-bottom:18px;line-height:1.75}
+.tblank{display:inline-block;min-width:80px;padding:0 4px;text-align:center;border-bottom:3px solid var(--accent);transition:all .3s}
+.thl{background:#EEF6FF;border-radius:6px;padding:2px 7px;display:inline-block;animation:pulseHL 2.5s ease infinite}
+
+/* options */
+.opts{display:flex;flex-direction:column;gap:10px}
+.obt{min-height:48px;padding:12px 20px;border-radius:24px;border:2.5px solid var(--accent);background:#fff;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:var(--accent);cursor:pointer;transition:all .2s;animation:slideUp .3s ease both}
+.obt:hover:not(:disabled){background:var(--accent);color:#fff}
+.obt.ok{background:var(--ok);border-color:var(--ok);color:var(--txt);animation:pop .3s ease}
+.obt.no{background:var(--err);border-color:var(--err);color:var(--txt);animation:shake .35s ease}
+.obt:disabled{cursor:default}
+.hint-sm{background:none;border:1px solid var(--muted);border-radius:20px;padding:7px 14px;font-family:'Nunito',sans-serif;font-size:.82rem;color:var(--muted);cursor:pointer;margin-bottom:10px;display:inline-block;transition:all .2s}
+.hint-sm:hover{border-color:var(--accent);color:var(--accent)}
+
+/* word order */
+.wo-area{min-height:56px;border:2.5px dashed var(--accent);border-radius:12px;padding:10px 12px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;transition:background .3s,border-color .3s}
+.wo-area.ok-bg{background:var(--ok);border-color:var(--ok)}
+.wo-area.err-bg{background:var(--err);border-color:var(--err);animation:shake .35s ease}
+.wo-ph{color:var(--muted);font-size:.88rem}
+.wo-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.wchip{padding:8px 14px;background:#fff;border:2px solid var(--accent);border-radius:20px;font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:600;color:var(--accent);cursor:pointer;min-height:40px;display:flex;align-items:center;transition:all .2s;animation:bounceIn .3s ease both}
+.wchip:hover:not(:disabled){background:var(--accent);color:#fff}
+.wchip:disabled{opacity:.35;cursor:default}
+.achip{padding:8px 14px;background:var(--accent);border:2px solid var(--accent);border-radius:20px;font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:600;color:#fff;cursor:pointer;min-height:40px;display:flex;align-items:center;transition:all .2s}
+.achip:hover{background:var(--accentH);border-color:var(--accentH)}
+.chk-btn{min-height:48px;width:100%;border-radius:24px;border:none;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+.chk-off{background:var(--ice);color:var(--muted);cursor:not-allowed}
+.chk-on{background:var(--accent);color:#fff}
+.chk-on:hover{background:var(--accentH)}
+
+/* error correction */
+.ec-row{display:flex;gap:12px}
+.ec-btn{flex:1;min-height:52px;border-radius:12px;border:2.5px solid;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;background:#fff}
+.ec-y{border-color:#4CAF50;color:#4CAF50}
+.ec-y:hover:not(:disabled){background:#4CAF50;color:#fff}
+.ec-n{border-color:#E57373;color:#E57373}
+.ec-n:hover:not(:disabled){background:#E57373;color:#fff}
+.ec-btn:disabled{opacity:.55;cursor:default}
+
+/* feedback panel */
+.fb-panel{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:#fff;border-radius:20px 20px 0 0;padding:20px 20px 28px;box-shadow:0 -6px 24px rgba(0,0,0,.13);z-index:200;animation:slideUp .3s ease}
+.fb-ok{border-top:5px solid var(--ok)}
+.fb-err{border-top:5px solid var(--err)}
+.fb-lbl{font-size:1rem;font-weight:700;margin-bottom:6px}
+.fb-lbl-ok{color:#2E7D32}
+.fb-lbl-err{color:#C62828}
+.fb-ans{font-size:1rem;font-weight:700;margin:6px 0;color:#2E7D32}
+.fb-hint{font-size:.88rem;color:var(--muted);margin-bottom:16px;line-height:1.55}
+.fb-btn{min-height:46px}
+
+/* modals */
+.m-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px}
+.m-box{background:#fff;border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;animation:slideUp .3s ease}
+.m-snow{font-size:56px;margin-bottom:10px}
+.m-txt{font-size:1rem;line-height:1.65;margin-bottom:20px}
+.m-btns{display:flex;flex-direction:column;gap:10px}
+
+/* hint sheet */
+.hs-ov{position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:299}
+.hs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;box-shadow:0 -6px 24px rgba(0,0,0,.12);z-index:300;animation:slideUp .3s ease}
+.hs-title{font-size:1.1rem;font-weight:700;margin-bottom:10px}
+.hs-txt{font-size:.9rem;line-height:1.75;white-space:pre-line;margin-bottom:18px}
+
+/* result */
+.res-screen{align-items:center;justify-content:center;text-align:center;gap:14px}
+.res-char{font-size:100px;line-height:1}
+.res-title{font-size:1.5rem;font-weight:700}
+.res-stars{display:flex;gap:8px;justify-content:center;margin:4px 0}
+.rstar{font-size:38px;opacity:0}
+.rstar.show{animation:starPop .4s ease forwards}
+.rstar.dim{opacity:.18}
+.res-stat{font-size:.88rem;color:var(--muted);line-height:1.65}
+.res-outro{font-size:.9rem;font-style:italic;color:var(--muted);max-width:280px;text-align:center}
+.res-btns{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:8px}
+
+/* collection */
+.coll-screen{padding-top:60px;position:relative}
+.coll-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+.coll-cnt{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:24px}
+.coll-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.coll-item{background:#fff;border-radius:14px;padding:20px 12px;text-align:center;box-shadow:0 2px 8px var(--sh)}
+.coll-item.lk{background:var(--ice)}
+.coll-em{font-size:60px;line-height:1;display:block;margin-bottom:8px}
+.coll-item.lk .coll-em{filter:grayscale(1);opacity:.3}
+.coll-nm{font-weight:700;font-size:.88rem}
+.coll-item.lk .coll-nm{color:var(--muted)}
+
+/* final */
+.fin-screen{align-items:center;justify-content:center;text-align:center;gap:14px;position:relative}
+.confetti-wrap{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:0}
+.cp{position:absolute;animation:snowFall linear both}
+.fin-chars{display:flex;gap:10px;justify-content:center}
+.fin-char{font-size:44px;line-height:1;animation:bounceIn .5s ease both}
+.fin-score{font-size:1.4rem;font-weight:700;color:var(--accent)}
+.fin-btns{display:flex;flex-direction:column;gap:10px;width:100%;z-index:1}
+
+/* back button (absolute) */
+.back-abs{position:absolute;top:16px;left:16px;width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.85);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px var(--sh);transition:background .2s}
+.back-abs:hover{background:#fff}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+
+// ═══════════════════════════════ DATA ═══════════════════════════════
+
+const CHARS = [
+  {id:1,name:'Пингвинёнок Пип',emoji:'🐧'},
+  {id:2,name:'Зайка Снежана',  emoji:'🐰'},
+  {id:3,name:'Котёнок Льдинка',emoji:'🐱'},
+  {id:4,name:'Щенок Морозко',  emoji:'🐶'},
+  {id:5,name:'Принцесса Марина',emoji:'👸'}
+];
+
+const PRAISY = ['Точно! Молодец!','Супер! Так держать!','Правильно! Ты умница!','Да! Отлично!','Верно! Круто!','Ура! Получилось!'];
+const OOPSYS = ['Ой, не то... Смотри:','Почти! Но не совсем:','Упс! Давай разберёмся:','Не угадала. Вот как правильно:'];
+
+const LHINTS = {
+  1:'Один человек/предмет → Is\n  Is he? Is she? Is it?\n\nМного или «ты/вы» → Are\n  Are you? Are they? Are we?',
+  2:'Вопрос с Is → ответ с is\n  Yes, she is. / No, she isn\'t.\n\nВопрос с Are → ответ с are\n  Yes, they are. / No, they aren\'t.',
+  3:'I, you, we, they → Do\n  Do you like? Do they play?\n\nHe, she, it → Does\n  Does he like? Does she play?\n\nПосле Do/Does глагол БЕЗ -s!'
+};
+
+const LEVELS = [
+  { id:1, title:'Вопросы с be', ci:0,
+    intro:'Привет! Я Снежок. Пингвинёнок Пип замёрз и забыл, как задавать вопросы. Поможешь ему? Нужно выбрать Is или Are!',
+    outro:'Ура! Ты помогла Пипу вспомнить вопросы! Он больше не замёрзший!',
+    tasks:[
+      {t:'gap', ch:'🐧',cn:'Пип',    ctx:'Пип спрашивает про маму',      eng:'___ she kind?',           opts:['Is','Are','Does'],       ans:'Is',     hint:'She — это один человек. Один → Is'},
+      {t:'word',ch:'🐧',cn:'Пип',    ctx:'Составь вопрос для Пипа',     rus:'Они счастливые?',         words:['Are','Is','they','happy','?'],           correct:['Are','they','happy','?'],           hint:'They (они) — это много. Много → Are'},
+      {t:'gap', ch:'🐧',cn:'Пип',    ctx:'Пип спрашивает про друзей',   eng:'___ your friends funny?', opts:['Is','Are','Do'],          ans:'Are',    hint:'Friends — друзья, их много. Много → Are'},
+      {t:'err', ch:'⛄',cn:'Снежок', ctx:'Снежок написал вопрос. Всё правильно?', eng:'Are your cat big?', hl:'Are', ok:false, fix:'Are → Is', hint:'Cat — один кот. Один → Is'},
+      {t:'gap', ch:'🐧',cn:'Пип',    ctx:'Переведи вопрос для Пипа',    rus:'Твой папа добрый?',       eng:'___ your dad kind?',       opts:['Is','Are','Does'],       ans:'Is',     hint:'Dad — один человек. Один → Is'},
+      {t:'gap', ch:'🐧',cn:'Пип',    ctx:'Последний вопрос от Пипа',    eng:'___ you happy?',          opts:['Is','Are','Do'],          ans:'Are',    hint:'You (ты) → всегда Are'}
+    ]
+  },
+  { id:2, title:'Ответы с be', ci:1,
+    intro:'Отлично! Теперь Зайка Снежана. Она помнит вопросы, но забыла, как отвечать. Научим её?',
+    outro:'Снежана вспомнила, как отвечать! Теперь она может болтать с друзьями!',
+    tasks:[
+      {t:'gap', ch:'🐰',cn:'Снежана',ctx:'Is your brother kind? — Да!',                          eng:'Yes, he ___',               opts:['is.','are.','does.'],      ans:'is.',    hint:'Вопрос с Is → ответ с is'},
+      {t:'word',ch:'🐰',cn:'Снежана',ctx:'Составь ответ',              rus:'Нет, она не грустная.', words:["No,","she","isn't","aren't","sad.","he"],correct:["No,","she","isn't","sad."], hint:"She → isn't (is + not)"},
+      {t:'gap', ch:'🐰',cn:'Снежана',ctx:'Are they your friends? — Нет!',                         eng:'No, they ___',              opts:["aren't.","isn't.","don't."],ans:"aren't.", hint:"Вопрос с Are → ответ с aren't"},
+      {t:'err', ch:'⛄',cn:'Снежок', ctx:'Снежок ответил на вопрос. Правильно?',eng:"Is she happy? — Yes, she is.",hl:"is.", ok:true, fix:null, hint:'Молодец! Is в вопросе → is в ответе'},
+      {t:'gap', ch:'🐰',cn:'Снежана',ctx:'Переведи ответ',             rus:'Нет, он не большой. Он маленький.',eng:"No, he ___ big. He is small.", opts:["isn't","aren't","doesn't"],ans:"isn't",hint:"He — один. Отрицание: is + not = isn't"},
+      {t:'gap', ch:'🐰',cn:'Снежана',ctx:'Are your cats funny? — Да!',                            eng:'Yes, they ___',             opts:['are.','is.','do.'],         ans:'are.',   hint:'Вопрос с Are → ответ с are'}
+    ]
+  },
+  { id:3, title:'Вопросы с do/does', ci:2,
+    intro:'Теперь сложнее! Котёнок Льдинка забыла вопросы с Do и Does. Запомни: he, she, it → Does. Остальные → Do. И глагол без -s!',
+    outro:'Льдинка снова умеет спрашивать! Слышишь, как она мурлычет от радости?',
+    tasks:[
+      {t:'gap', ch:'🐱',cn:'Льдинка',ctx:'Льдинка спрашивает про брата',   eng:'___ he like fish?',          opts:['Does','Do','Is'],         ans:'Does',hint:'He → Does. Запомни: he, she, it → Does'},
+      {t:'word',ch:'🐱',cn:'Льдинка',ctx:'Составь вопрос',                 rus:'Ты любишь яблоки?',          words:['Do','Does','you','like','likes','apples','?'],correct:['Do','you','like','apples','?'],hint:'You → Do. И после Do/Does глагол без -s: like, не likes!'},
+      {t:'gap', ch:'🐱',cn:'Льдинка',ctx:'Льдинка спрашивает про сестру',  eng:'___ she play with toys?',    opts:['Does','Do','Is'],         ans:'Does',hint:'She → Does'},
+      {t:'err', ch:'⛄',cn:'Снежок', ctx:'Снежок составил вопрос. Есть ошибка?',eng:'Do they read books?',hl:'Do',ok:true,fix:null,hint:'Верно! They → Do'},
+      {t:'gap', ch:'🐱',cn:'Льдинка',ctx:'Переведи вопрос',                rus:'Твоя мама любит петь?',      eng:'___ your mom like singing?', opts:['Does','Do','Is'],        ans:'Does',hint:'Mom (мама) = she → Does'},
+      {t:'gap', ch:'🐱',cn:'Льдинка',ctx:'Последний вопрос',               eng:'___ your friends want a ball?',opts:['Do','Does','Are'],      ans:'Do',  hint:'Friends — много людей = they → Do'}
+    ]
+  },
+  { id:4, title:'Ответы с do/does', ci:3,
+    intro:"Щенок Морозко просит помощи! Он путает ответы. Запомни: вопрос с Does → ответ does/doesn't. Вопрос с Do → ответ do/don't. И после doesn't глагол без -s!",
+    outro:'Морозко счастлив! Теперь он может ответить на любой вопрос. Гав-гав!',
+    tasks:[
+      {t:'gap', ch:'🐶',cn:'Морозко',ctx:'Does she like bananas? — Да!',                       eng:'Yes, she ___',            opts:['does.','do.','is.'],          ans:'does.',  hint:'Does в вопросе → does в ответе'},
+      {t:'word',ch:'🐶',cn:'Морозко',ctx:'Составь ответ',             rus:'Нет, он не ест рыбу.', words:["No,","he","doesn't","don't","eat","eats","fish."],correct:["No,","he","doesn't","eat","fish."],hint:"He → doesn't. После doesn't глагол без -s: eat, не eats!"},
+      {t:'gap', ch:'🐶',cn:'Морозко',ctx:'Do you love your dog? — Да!',                         eng:'Yes, I ___',              opts:['do.','does.','am.'],           ans:'do.',    hint:'Do в вопросе → do в ответе'},
+      {t:'err', ch:'⛄',cn:'Снежок', ctx:'Проверь ответ Снежка',eng:"Does he play? — No, he doesn't plays.",hl:"doesn't plays.",ok:false,fix:"doesn't plays → doesn't play",hint:"После doesn't глагол голый: doesn't play (без -s)"},
+      {t:'gap', ch:'🐶',cn:'Морозко',ctx:'Переведи',                  rus:'Они не хотят эту игрушку.', eng:'They ___ want this toy.',opts:["don't","doesn't","aren't"],ans:"don't", hint:"They → don't"},
+      {t:'gap', ch:'🐶',cn:'Морозко',ctx:'Does your cat like fish? — Нет!',                      eng:'No, it ___',              opts:["doesn't.","don't.","isn't."],  ans:"doesn't.",hint:"Does в вопросе → doesn't в отрицательном ответе"}
+    ]
+  },
+  { id:5, title:'Can + финальный микс', ci:4,
+    intro:'Остался последний шаг — спасти Принцессу Марину! Вспомним всё: Is/Are, Do/Does и добавим Can. С can всё просто: can для всех, без изменений!',
+    outro:'Ты спасла Принцессу Марину и всё королевство! Заклятие снято!',
+    tasks:[
+      {t:'gap', ch:'👸',cn:'Марина',ctx:'Принцесса спрашивает про тебя',  eng:'___ you swim?',           opts:['Can','Do','Are'],          ans:'Can',   hint:'Спрашиваем про умение → Can'},
+      {t:'word',ch:'👸',cn:'Марина',ctx:'Составь ответ',                  rus:'Да, она умеет петь.',     words:["Yes,","she","can","can't","sing.","sings."],correct:["Yes,","she","can","sing."],hint:'После can глагол без -s: can sing'},
+      {t:'gap', ch:'👸',cn:'Марина',ctx:'Вспомним Do/Does',               eng:'___ they like this song?',opts:['Do','Does','Can'],         ans:'Do',    hint:'They → Do'},
+      {t:'err', ch:'⛄',cn:'Снежок',ctx:'Найди ошибку, если она есть',    eng:'Can she reads books?',    hl:'reads',ok:false,fix:'reads → read',hint:'После can глагол без -s: can read'},
+      {t:'gap', ch:'👸',cn:'Марина',ctx:'Переведи',                       rus:'Он не умеет плавать.',    eng:'He ___ swim.',               opts:["can't","doesn't","isn't"],ans:"can't",hint:"Не умеет = can't (can + not)"},
+      {t:'gap', ch:'👸',cn:'Марина',ctx:'Финальный вопрос!',              eng:'___ your sister happy?',  opts:['Is','Does','Can'],         ans:'Is',    hint:'Happy — это прилагательное. Прилагательное → Is/Are'}
+    ]
+  }
+];
+
+// ═══════════════════════════════ STATE ═══════════════════════════════
+
+let S = {
+  done:[], stars:{}, score:0, chars:[],
+  lvl:0, ti:0, lscore:0, mistakes:0, streak:0,
+  wsel:[], answered:false
+};
+
+// ═══════════════════════════════ STORAGE ═════════════════════════════
+
+function sv(){try{localStorage.setItem('ikv3',JSON.stringify({done:S.done,stars:S.stars,score:S.score,chars:S.chars}))}catch(e){}}
+function ld(){try{const d=JSON.parse(localStorage.getItem('ikv3')||'null');if(d){S.done=d.done||[];S.stars=d.stars||{};S.score=d.score||0;S.chars=d.chars||[]}}catch(e){}}
+function rst(){try{localStorage.removeItem('ikv3')}catch(e){}; S.done=[];S.stars={};S.score=0;S.chars=[];}
+
+// ═══════════════════════════════ UTILS ═══════════════════════════════
+
+const $=id=>document.getElementById(id);
+const app=()=>$('app');
+function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b}
+function starsN(m){return m===0?3:m<=2?2:1}
+function setHTML(h){app().innerHTML=h}
+function lv(){return LEVELS.find(l=>l.id===S.lvl)}
+function tk(){return lv().tasks[S.ti]}
+
+// ═══════════════════════════════ START ═══════════════════════════════
+
+function showStart(){
+  const p=S.done.length;
+  setHTML(`<div class="screen start-screen">
+    <div class="s-snow">⛄</div>
+    <h1 class="s-title">Ледяное Королевство</h1>
+    <p class="s-sub">Спаси жителей — вспомни грамматику!</p>
+    <div class="s-btns">
+      <button class="btn btn-p" id="s-play">▶ Играть</button>
+      <button class="btn btn-o" id="s-coll">🎁 Коллекция</button>
+      <button class="btn btn-t" id="s-reset">Сбросить прогресс</button>
+    </div>
+    ${p>0?`<p class="s-prog">Пройдено: ${p}/5 уровней · ${S.score} ⭐</p>`:''}
+  </div>`);
+  $('s-play').onclick=showMap;
+  $('s-coll').onclick=showColl;
+  $('s-reset').onclick=()=>{
+    if(confirm('Сбросить весь прогресс?')){
+      rst();
+      showStart();
+    }
+  };
+}
+
+// ═══════════════════════════════ MAP ═════════════════════════════════
+
+function showMap(){
+  const rows=LEVELS.map((lv,i)=>{
+    const done=S.done.includes(lv.id);
+    const cur=!done&&(i===0||S.done.includes(LEVELS[i-1].id));
+    const lock=!done&&!cur;
+    const dc=done?'done':cur?'cur':'lock';
+    const di=done?'✓':lock?'🔒':lv.id;
+    const st=done&&S.stars[lv.id]?'⭐'.repeat(S.stars[lv.id]):'';
+    const ch=CHARS[lv.ci].emoji;
+    const line=i<LEVELS.length-1?`<div class="map-line"></div>`:'';
+    return `<div class="map-row${lock?'':' avail'}" data-id="${lv.id}" data-av="${lock?0:1}">
+      <div class="map-dot ${dc}">${di}</div>
+      <div class="map-info">
+        <div class="map-lname">${lv.title}</div>
+        ${st?`<div class="map-stars">${st}</div>`:''}
+      </div>
+      <div class="map-char">${lock?'❄️':ch}</div>
+      ${line}
+    </div>`;
+  }).join('');
+  setHTML(`<div class="screen map-screen">
+    <button class="back-abs" id="mb">←</button>
+    <h2 class="map-title">Карта путешествия</h2>
+    <div class="map-list" id="mlist">${rows}</div>
+  </div>`);
+  $('mb').onclick=showStart;
+  $('mlist').querySelectorAll('.map-row.avail').forEach(r=>{
+    r.addEventListener('click',()=>startLv(parseInt(r.dataset.id)));
+  });
+}
+
+// ═══════════════════════════════ COLLECTION ══════════════════════════
+
+function showColl(){
+  const items=CHARS.map(c=>{
+    const u=S.chars.includes(c.id);
+    return `<div class="coll-item${u?'':' lk'}"><span class="coll-em">${c.emoji}</span><div class="coll-nm">${u?c.name:'???'}</div></div>`;
+  }).join('');
+  setHTML(`<div class="screen coll-screen">
+    <button class="back-abs" id="cb">←</button>
+    <h2 class="coll-title">Твои друзья</h2>
+    <p class="coll-cnt">Спасено: ${S.chars.length}/5</p>
+    <div class="coll-grid">${items}</div>
+  </div>`);
+  $('cb').onclick=showStart;
+}
+
+// ═══════════════════════════════ LEVEL START ═════════════════════════
+
+function startLv(id){
+  const lvl=LEVELS.find(l=>l.id===id);
+  S.lvl=id; S.ti=0; S.lscore=0; S.mistakes=0; S.streak=0; S.answered=false;
+  const m=document.createElement('div');
+  m.className='m-overlay';
+  m.innerHTML=`<div class="m-box"><div class="m-snow">⛄</div><p class="m-txt">${lvl.intro}</p>
+    <div class="m-btns"><button class="btn btn-p" id="mg">Начинаем! →</button></div></div>`;
+  app().appendChild(m);
+  $('mg').onclick=()=>{m.remove();renderTask()};
+}
+
+// ═══════════════════════════════ TASK RENDER ═════════════════════════
+
+function renderTask(){
+  const level=lv(); const task=tk();
+  S.answered=false; S.wsel=[];
+  const pct=(S.ti/level.tasks.length)*100;
+  const sh=S.lvl<=3;
+  const stk=S.streak>=2?`<span class="stk-badge">🔥 ${S.streak}</span>`:'';
+
+  let body='';
+  if(task.t==='gap'||task.t==='trl') body=buildGap(task,sh);
+  else if(task.t==='word') body=buildWord(task);
+  else if(task.t==='err') body=buildErr(task);
+
+  setHTML(`<div class="screen task-screen">
+    <div class="topbar">
+      <button class="back-sm" id="tbk">←</button>
+      <div class="pbw"><div class="pbf" style="width:${pct}%"></div></div>
+      ${stk}
+      <div class="sc-badge">⭐ ${S.score+S.lscore}</div>
+    </div>
+    <div class="snowjoke">
+      <div class="sj-face">⛄</div>
+      <div class="sj-txt" id="sjtxt">Задание ${S.ti+1} из ${level.tasks.length}</div>
+    </div>
+    ${body}
+  </div>`);
+
+  $('tbk').onclick=()=>{if(confirm('Выйти? Прогресс уровня будет потерян.'))showMap()};
+
+  if(task.t==='gap'||task.t==='trl') bindGap(task,sh);
+  else if(task.t==='word') bindWord(task);
+  else if(task.t==='err') bindErr(task);
+}
+
+// ── Build gap-fill HTML ──
+function buildGap(task,sh){
+  const rusLine=task.rus?`<div class="trus">🇷🇺 ${task.rus}</div>`:'';
+  const eng=task.eng.replace('___',`<span class="tblank" id="bl">　　　　</span>`);
+  const hb=sh?`<button class="hint-sm" id="hbtn">💡 Подсказка</button>`:'';
+  const opts=task.opts.map((o,i)=>
+    `<button class="obt" style="animation-delay:${i*.08}s" data-o="${o}">${o}</button>`).join('');
+  return `<div class="tcard">
+    <div class="char-row"><span class="char-em">${task.ch}</span><span class="char-nm">${task.cn}</span></div>
+    <div class="tctx">${task.ctx}</div>${rusLine}
+    <div class="teng" id="teng">${eng}</div>
+    ${hb}<div class="opts" id="opts">${opts}</div>
+  </div>`;
+}
+
+function bindGap(task,sh){
+  document.querySelectorAll('.obt').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(S.answered)return;
+      S.answered=true;
+      document.querySelectorAll('.obt').forEach(b=>b.disabled=true);
+      const sel=btn.dataset.o;
+      const ok=sel===task.ans;
+      if(ok){
+        btn.classList.add('ok');
+        const bl=$('bl');
+        if(bl){bl.textContent=task.ans;bl.style.borderColor='var(--ok)'}
+        onOK();
+      } else {
+        btn.classList.add('no');
+        document.querySelectorAll('.obt').forEach(b=>{if(b.dataset.o===task.ans)b.classList.add('ok')});
+        onFail(task.ans, task.hint);
+      }
+    });
+  });
+  const hb=$('hbtn');
+  if(hb) hb.addEventListener('click',()=>showHint(S.lvl));
+}
+
+// ── Build word-order HTML ──
+function buildWord(task){
+  const sf=shuf(task.words);
+  const chips=sf.map((w,i)=>
+    `<button class="wchip" data-pi="${i}" data-w="${w.replace(/"/g,'&quot;')}" style="animation-delay:${i*.05}s">${w}</button>`
+  ).join('');
+  return `<div class="tcard">
+    <div class="char-row"><span class="char-em">${task.ch}</span><span class="char-nm">${task.cn}</span></div>
+    <div class="tctx">${task.ctx}</div>
+    <div class="trus">🇷🇺 ${task.rus}</div>
+    <div class="wo-area" id="woa"><span class="wo-ph" id="woph">Нажимай на слова</span></div>
+    <div class="wo-pool" id="wpool">${chips}</div>
+    <button class="chk-btn chk-off" id="wchk" disabled>Проверить</button>
+  </div>`;
+}
+
+function bindWord(task){
+  const pool=$('wpool'), area=$('woa'), chk=$('wchk'), ph=$('woph');
+  function upd(){
+    const has=S.wsel.length>0;
+    chk.className='chk-btn '+(has?'chk-on':'chk-off');
+    chk.disabled=!has;
+  }
+  pool.querySelectorAll('.wchip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      if(S.answered)return;
+      const pi=chip.dataset.pi, w=chip.dataset.w;
+      chip.disabled=true;
+      S.wsel.push({w,pi});
+      if(ph)ph.style.display='none';
+      const ac=document.createElement('button');
+      ac.className='achip'; ac.textContent=w; ac.dataset.pi=pi;
+      ac.addEventListener('click',()=>{
+        if(S.answered)return;
+        S.wsel=S.wsel.filter(x=>x.pi!==pi);
+        const orig=pool.querySelector(`[data-pi="${pi}"]`);
+        if(orig){orig.disabled=false;}
+        ac.remove();
+        if(area.querySelectorAll('.achip').length===0&&ph)ph.style.display='';
+        upd();
+      });
+      area.appendChild(ac);
+      upd();
+    });
+  });
+  chk.addEventListener('click',()=>{
+    if(S.answered||S.wsel.length===0)return;
+    S.answered=true; chk.disabled=true;
+    const ua=S.wsel.map(x=>x.w).join(' ');
+    const ca=task.correct.join(' ');
+    if(ua===ca){area.classList.add('ok-bg');onOK();}
+    else{area.classList.add('err-bg');onFail(ca,task.hint);}
+  });
+}
+
+// ── Build error correction HTML ──
+function buildErr(task){
+  // Safely replace highlighted word (escape for display)
+  const hl=task.hl.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const rawEng=task.eng.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Replace the last occurrence to handle duplicates like "doesn't plays."
+  const idx=rawEng.lastIndexOf(hl);
+  const engHtml=idx>=0
+    ? rawEng.slice(0,idx)+`<span class="thl">${hl}</span>`+rawEng.slice(idx+hl.length)
+    : rawEng;
+  return `<div class="tcard">
+    <div class="char-row"><span class="char-em">${task.ch}</span><span class="char-nm">${task.cn}</span></div>
+    <div class="tctx">${task.ctx}</div>
+    <div class="teng">${engHtml}</div>
+    <div class="ec-row">
+      <button class="ec-btn ec-y" id="ecy">Правильно ✓</button>
+      <button class="ec-btn ec-n" id="ecn">Ошибка ✗</button>
+    </div>
+  </div>`;
+}
+
+function bindErr(task){
+  function handle(userOk){
+    if(S.answered)return;
+    S.answered=true;
+    $('ecy').disabled=true; $('ecn').disabled=true;
+    const right=userOk===task.ok;
+    if(right){
+      onOK();
+    } else {
+      const msg=task.ok
+        ? `Это правильное предложение! ${task.hint}`
+        : `Ошибка: ${task.fix}. ${task.hint}`;
+      onFail(task.fix?`✅ ${task.fix}`:null, msg);
+    }
+  }
+  $('ecy').addEventListener('click',()=>handle(true));
+  $('ecn').addEventListener('click',()=>handle(false));
+}
+
+// ═══════════════════════════════ FEEDBACK ════════════════════════════
+
+function onOK(){
+  S.streak++;
+  S.lscore+=10;
+  let msg=rnd(PRAISY);
+  if(S.streak===3)msg='Вау, три подряд! Ты огонь! 🔥';
+  else if(S.streak===5)msg='Пять! Ты просто звезда! ⭐';
+  else if(S.streak===6)msg='Идеально! Ни одной ошибок! 🏆';
+  const sj=$('sjtxt'); if(sj)sj.textContent=msg;
+  setTimeout(nextTask,1200);
+}
+
+function onFail(ans,hint){
+  S.streak=0; S.mistakes++; S.lscore+=5;
+  const msg=rnd(OOPSYS);
+  const sj=$('sjtxt'); if(sj)sj.textContent=msg;
+  const p=document.createElement('div');
+  p.className='fb-panel fb-err';
+  p.innerHTML=`<div class="fb-lbl fb-lbl-err">${msg}</div>
+    ${ans?`<div class="fb-ans">${ans}</div>`:''}
+    <div class="fb-hint">${hint}</div>
+    <button class="btn btn-p fb-btn" id="fb-ok">Понятно 👍</button>`;
+  app().appendChild(p);
+  $('fb-ok').addEventListener('click',()=>{p.remove();nextTask()});
+}
+
+function nextTask(){
+  if(S.ti+1>=lv().tasks.length) completeLevel();
+  else{S.ti++;renderTask();}
+}
+
+// ═══════════════════════════════ LEVEL DONE ══════════════════════════
+
+function completeLevel(){
+  const level=lv();
+  const stars=starsN(S.mistakes);
+  const cf=level.tasks.length-S.mistakes;
+  if(!S.done.includes(level.id))S.done.push(level.id);
+  S.stars[level.id]=Math.max(stars,S.stars[level.id]||0);
+  S.score+=S.lscore;
+  if(!S.chars.includes(level.id))S.chars.push(level.id);
+  sv();
+  showResult(level,stars,cf);
+}
+
+function showResult(level,stars,cf){
+  const ch=CHARS[level.ci];
+  const fin=level.id===5;
+  setHTML(`<div class="screen res-screen">
+    <div class="res-char" id="rch" style="opacity:0;transform:scale(.5);">${ch.emoji}</div>
+    <h2 class="res-title" id="rtit" style="opacity:0;">Ты спасла персонажа ${ch.name}!</h2>
+    <div class="res-stars">
+      <span class="rstar" id="rs1">⭐</span>
+      <span class="rstar" id="rs2">⭐</span>
+      <span class="rstar" id="rs3">⭐</span>
+    </div>
+    <div class="res-stat" id="rstat" style="opacity:0;">Правильно с первой попытки: ${cf}/${level.tasks.length}<br>Очки за уровень: +${S.lscore}</div>
+    <p class="res-outro" id="rout" style="opacity:0;">${level.outro}</p>
+    <div class="res-btns" id="rbtns" style="opacity:0;">
+      ${fin?`<button class="btn btn-p" id="rnxt">🎉 Посмотреть финал!</button>`:`<button class="btn btn-p" id="rnxt">Дальше →</button>`}
+      <button class="btn btn-t" id="rrpt">Повторить уровень</button>
+    </div>
+  </div>`);
+  setTimeout(()=>{
+    const c=$('rch');
+    if(c){c.style.transition='all .5s cubic-bezier(.34,1.56,.64,1)';c.style.opacity='1';c.style.transform='scale(1)'}
+    setTimeout(()=>{
+      ['rtit','rstat','rout','rbtns'].forEach(id=>{const e=$(id);if(e){e.style.transition='opacity .4s ease';e.style.opacity='1'}});
+      [1,2,3].forEach((i,idx)=>{
+        const s=$(`rs${i}`);if(!s)return;
+        if(idx<stars)setTimeout(()=>s.classList.add('show'),idx*320);
+        else s.classList.add('dim');
+      });
+      const nx=$('rnxt'),rp=$('rrpt');
+      if(nx)nx.addEventListener('click',fin?showFinal:showMap);
+      if(rp)rp.addEventListener('click',()=>startLv(level.id));
+    },550);
+  },80);
+}
+
+// ═══════════════════════════════ FINAL ═══════════════════════════════
+
+function showFinal(){
+  const emj=['❄️','⭐','✨','💙','🌟','💎'];
+  const conf=Array.from({length:26},(_,i)=>{
+    const l=Math.random()*100, d=Math.random()*1.5, dur=2.5+Math.random()*2;
+    return `<div class="cp" style="left:${l}%;font-size:${15+Math.random()*12}px;animation-duration:${dur}s;animation-delay:${d}s;">${emj[i%6]}</div>`;
+  }).join('');
+  const chars=CHARS.map((c,i)=>`<span class="fin-char" style="animation-delay:${i*.12}s;">${c.emoji}</span>`).join('');
+  setHTML(`<div class="screen fin-screen">
+    <div class="confetti-wrap">${conf}</div>
+    <div style="font-size:52px;z-index:1;">🏆</div>
+    <h1 style="font-size:1.8rem;font-weight:700;z-index:1;">Поздравляем!</h1>
+    <p style="color:var(--muted);z-index:1;">Королевство спасено! 🏰</p>
+    <div class="fin-chars" style="z-index:1;">${chars}</div>
+    <div class="fin-score" style="z-index:1;">Твои очки: ${S.score} ⭐</div>
+    <div class="fin-btns">
+      <button class="btn btn-p" id="fa">↺ Играть снова</button>
+      <button class="btn btn-o" id="fc">🎁 Коллекция</button>
+    </div>
+  </div>`);
+  $('fa').addEventListener('click',()=>{rst();showStart()});
+  $('fc').addEventListener('click',showColl);
+}
+
+// ═══════════════════════════════ HINT SHEET ══════════════════════════
+
+function showHint(id){
+  const txt=LHINTS[id]; if(!txt)return;
+  const ov=document.createElement('div'); ov.className='hs-ov';
+  const sh=document.createElement('div'); sh.className='hs';
+  sh.innerHTML=`<div class="hs-title">💡 Подсказка</div>
+    <div class="hs-txt">${txt}</div>
+    <button class="btn btn-p" id="hsc">Понятно!</button>`;
+  app().appendChild(ov); app().appendChild(sh);
+  const cl=()=>{ov.remove();sh.remove()};
+  ov.addEventListener('click',cl);
+  $('hsc').addEventListener('click',cl);
+}
+
+// ═══════════════════════════════ INIT ════════════════════════════════
+
+function init(){ld();showStart();}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
