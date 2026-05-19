@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#B8612A">
+<title>Тренажёр неправильных глаголов</title>
+<style>
+:root {
+  --bg-page: #F8F4ED;
+  --bg-card: #FFFCF6;
+  --text-primary: #1E2A44;
+  --text-secondary: #5C6478;
+  --border-card: #E5DFD3;
+  --accent: #B8612A;
+  --accent-hover: #9A4F22;
+  --accent-light: #F0E4D2;
+  --success: #5C7A3E;
+  --success-bg: #EDF2E3;
+  --error: #A8412D;
+  --error-bg: #F7E5DF;
+  --star-filled: #D4A636;
+  --star-empty: #C8C0B0;
+  --shadow-card: 0 2px 6px rgba(60,40,20,0.06), 0 1px 2px rgba(60,40,20,0.04);
+  --card-verb-bg: #FCF8F0;
+  --font-serif: Georgia, 'Cambria', 'Times New Roman', 'PT Serif', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+  --easy-bg: #EDF2E3; --easy-border: #5C7A3E; --easy-text: #3F5527;
+  --hard-bg: #FBF3DD; --hard-border: #D4A636; --hard-text: #7A5F19;
+  --fail-bg: #F7E5DF; --fail-border: #A8412D; --fail-text: #6F2C1E;
+}
+[data-theme="dark"] {
+  --bg-page: #1C1B17; --bg-card: #26241E; --text-primary: #F0E9D8;
+  --text-secondary: #B0A89A; --border-card: #3A372E; --accent: #D4844A;
+  --accent-hover: #E09560; --accent-light: #3A3228; --success: #8FAB66;
+  --success-bg: #2A3320; --error: #D2715B; --error-bg: #3A2520;
+  --star-filled: #E8C25A; --star-empty: #5A5545; --card-verb-bg: #2E2C24;
+  --shadow-card: 0 2px 6px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+  --easy-bg: #2A3320; --easy-border: #8FAB66; --easy-text: #B8D490;
+  --hard-bg: #3A3218; --hard-border: #E8C25A; --hard-text: #E8C25A;
+  --fail-bg: #3A2520; --fail-border: #D2715B; --fail-text: #E8998A;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 18px; }
+@media (min-width: 768px) { html { font-size: 19px; } }
+body {
+  font-family: var(--font-sans); background: var(--bg-page); color: var(--text-primary);
+  line-height: 1.6; -webkit-text-size-adjust: 100%; min-height: 100vh;
+}
+.container { max-width: 560px; margin: 0 auto; padding: 0 20px; }
+#result-content.container { padding-left: 28px; padding-right: 28px; }
+.screen { display: none; min-height: 100vh; }
+.screen.is-active { display: block; }
+.fade-in { animation: fadeIn 200ms ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+h1 { font-family: var(--font-serif); font-size: 1.556rem; font-weight: 600; line-height: 1.3; }
+h2 { font-family: var(--font-serif); font-size: 1.222rem; font-weight: 600; line-height: 1.3; }
+h3 { font-family: var(--font-sans); font-size: 1.056rem; font-weight: 600; line-height: 1.3; }
+@media (min-width: 768px) {
+  h1 { font-size: 1.684rem; } h2 { font-size: 1.263rem; } h3 { font-size: 1.053rem; }
+}
+.text-secondary { color: var(--text-secondary); }
+.verb-form { font-family: var(--font-mono); font-size: 1.444rem; font-weight: 600; }
+@media (min-width: 768px) { .verb-form { font-size: 1.579rem; } }
+.ipa { font-family: var(--font-mono); font-size: 0.889rem; color: var(--text-secondary); }
+@media (min-width: 768px) { .ipa { font-size: 0.895rem; } }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--font-sans); font-size: 1rem; font-weight: 600;
+  padding: 16px 28px; border-radius: 6px; border: none; cursor: pointer;
+  min-height: 52px; transition: transform 100ms ease, background 150ms ease;
+  text-decoration: none; line-height: 1.3; width: 100%;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-primary { background: var(--accent); color: var(--bg-card); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+.btn-secondary { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+.btn-secondary:hover:not(:disabled) { background: var(--accent-light); }
+.btn-danger { background: var(--error); color: var(--bg-card); }
+.btn-danger:hover:not(:disabled) { background: #8B3625; }
+.btn-link { background: none; border: none; color: var(--accent); padding: 8px; min-height: auto; width: auto; }
+.btn-link:hover { text-decoration: underline; }
+.card {
+  background: var(--bg-card); border: 1px solid var(--border-card);
+  border-radius: 10px; padding: 24px; box-shadow: var(--shadow-card);
+}
+.card-verb {
+  background: var(--card-verb-bg); border: 1px solid var(--border-card);
+  border-radius: 10px; padding: 16px; box-shadow: var(--shadow-card);
+}
+.card-verb.selected, .pool-card.selected { border: 2px solid var(--accent); background: var(--accent-light); }
+.card-verb.correct { border: 2px solid var(--success); background: var(--success-bg); }
+.card-verb.incorrect { border: 2px solid var(--error); background: var(--error-bg); }
+.progress-bar-track {
+  background: var(--border-card); height: 8px; border-radius: 4px; overflow: hidden;
+}
+.progress-bar-fill {
+  background: var(--accent); height: 100%; border-radius: 4px;
+  transition: width 300ms ease-out;
+}
+.star-icon { display: inline-block; }
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 100; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.is-active { display: flex; }
+.modal {
+  background: var(--bg-card); border-radius: 10px; padding: 32px; width: 100%;
+  max-width: 440px; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  animation: modalIn 200ms ease;
+}
+@keyframes modalIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+/* Welcome */
+#welcome.is-active { display: flex; align-items: center; justify-content: center; }
+.welcome-inner { text-align: center; width: 100%; max-width: 400px; padding: 40px 20px; }
+.welcome-inner h1 { margin-bottom: 8px; }
+.welcome-inner .subtitle { color: var(--text-secondary); margin-bottom: 32px; }
+.name-field { margin-bottom: 8px; }
+.name-field label { display: block; text-align: left; font-weight: 600; margin-bottom: 8px; font-size: 0.889rem; color: var(--text-secondary); }
+.name-field input {
+  width: 100%; padding: 14px 16px; font-size: 1rem; font-family: var(--font-sans);
+  border: 2px solid var(--border-card); border-radius: 6px; background: var(--bg-card);
+  color: var(--text-primary); outline: none; transition: border-color 150ms;
+}
+.name-field input:focus { border-color: var(--accent); }
+.name-hint { font-size: 0.833rem; color: var(--text-secondary); margin-bottom: 24px; text-align: left; }
+/* Menu */
+.menu-header {
+  position: sticky; top: 0; z-index: 10; background: var(--bg-page);
+  padding: 16px 0; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border-card);
+}
+.menu-header h2 { font-size: 1.111rem; }
+.settings-btn {
+  background: none; border: none; cursor: pointer; padding: 8px;
+  color: var(--text-secondary); min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+.settings-btn:hover { color: var(--accent); }
+.settings-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.units-section { padding: 24px 0; }
+.units-section h2 { margin-bottom: 16px; }
+.units-grid { display: flex; flex-direction: column; gap: 16px; }
+.unit-card {
+  background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+  padding: 20px 24px; box-shadow: var(--shadow-card); cursor: pointer; display: flex; gap: 16px;
+  align-items: center; transition: transform 100ms, box-shadow 150ms; text-align: left;
+  width: 100%; color: var(--text-primary); font-family: inherit;
+}
+.unit-card:hover { box-shadow: 0 4px 12px rgba(60,40,20,0.1); }
+.unit-card:active { transform: scale(0.98); }
+.unit-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.unit-num { font-family: var(--font-serif); font-size: 2rem; font-weight: 600; color: var(--accent); min-width: 40px; line-height: 1; }
+.unit-info { flex: 1; min-width: 0; }
+.unit-title { font-family: var(--font-serif); font-size: 1.056rem; font-weight: 600; }
+.unit-stars { display: flex; gap: 4px; flex-shrink: 0; }
+.menu-footer { padding: 16px 0 32px; text-align: center; color: var(--text-secondary); font-size: 0.889rem; border-top: 1px solid var(--border-card); }
+.ls-warning { background: var(--hard-bg); border: 1px solid var(--hard-border); color: var(--hard-text); padding: 12px 16px; border-radius: 6px; font-size: 0.833rem; margin-top: 16px; }
+/* Unit screen */
+.unit-header {
+  position: sticky; top: 0; z-index: 10; background: var(--bg-page);
+  padding: 12px 0; border-bottom: 1px solid var(--border-card);
+}
+.unit-header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.unit-back-btn {
+  background: none; border: none; cursor: pointer; color: var(--accent);
+  font-size: 0.889rem; font-weight: 600; padding: 8px 0; display: flex; align-items: center; gap: 4px;
+  font-family: var(--font-sans); min-height: 44px;
+}
+.unit-back-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.unit-header-center { text-align: center; flex: 1; }
+.unit-header-center h2 { font-size: 1rem; margin: 0; }
+.unit-header-center .unit-header-subtitle { font-size: 0.778rem; color: var(--text-secondary); }
+.step-indicator { font-size: 0.889rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+.unit-progress { padding: 8px 0 0; }
+.step-content { padding: 24px 0 32px; }
+.step-title { margin-bottom: 8px; }
+.step-instruction { color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+.step-progress-label { font-size: 0.833rem; color: var(--text-secondary); margin-bottom: 16px; }
+/* Step 1 */
+.subgroup-section { margin-bottom: 24px; }
+.subgroup-header { margin-bottom: 8px; }
+.subgroup-header h3 { margin-bottom: 2px; }
+.subgroup-hint { font-size: 0.833rem; color: var(--text-secondary); }
+.verb-cards-list { display: flex; flex-direction: column; gap: 12px; }
+.intro-verb-card { padding: 16px; }
+.intro-verb-card .verb-forms { margin-bottom: 4px; }
+.intro-verb-card .verb-ipas { margin-bottom: 6px; }
+.intro-verb-card .verb-ru { font-size: 1rem; }
+.read-note { font-size: 0.778rem; color: var(--accent); font-style: italic; margin-top: 4px; }
+.intro-text { color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; font-style: italic; padding: 16px; background: var(--accent-light); border-radius: 6px; }
+/* Step 2 - Sorting */
+.pool-hint { font-size: 0.833rem; color: var(--text-secondary); margin-bottom: 12px; font-style: italic; padding: 16px; background: var(--accent-light); border-radius: 6px; }
+.pool-section { margin-bottom: 24px; }
+.pool-cards { display: flex; flex-wrap: wrap; gap: 8px; }
+.pool-card {
+  padding: 12px 16px; cursor: pointer; transition: transform 100ms;
+  border: none; font-family: var(--font-sans); text-align: left;
+  background: var(--card-verb-bg); border: 1px solid var(--border-card);
+  border-radius: 10px; box-shadow: var(--shadow-card);
+}
+.pool-card:active { transform: scale(0.97); }
+.pool-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pool-card .pc-v1 { font-family: var(--font-mono); font-weight: 600; font-size: 1.111rem; }
+.pool-card .pc-forms { font-size: 0.778rem; color: var(--text-secondary); margin-top: 2px; }
+.pool-card .pc-ru { font-size: 0.778rem; color: var(--text-secondary); margin-top: 2px; }
+.baskets-section { display: flex; flex-direction: column; gap: 16px; }
+.basket {
+  border: 2px dashed var(--star-empty); border-radius: 10px; padding: 16px; min-height: 80px;
+  transition: border-color 150ms, background 150ms;
+}
+.basket.drop-target { border-color: var(--accent); border-style: solid; background: var(--accent-light); }
+.basket-header { margin-bottom: 8px; }
+.basket-title { font-weight: 600; font-size: 0.889rem; }
+.basket-hint { font-size: 0.778rem; color: var(--text-secondary); }
+.basket-count { font-size: 0.778rem; color: var(--text-secondary); }
+.basket-cards { display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; }
+.basket-chip {
+  background: var(--accent-light); border: 1px solid var(--border-card); border-radius: 6px;
+  padding: 6px 12px; font-family: var(--font-mono); font-size: 0.833rem; font-weight: 600;
+  cursor: pointer; transition: transform 100ms; display: inline-block;
+}
+.basket-chip:hover { background: var(--border-card); }
+.basket-chip.correct { background: var(--success-bg); border-color: var(--success); }
+.basket-chip.incorrect { background: var(--error-bg); border-color: var(--error); }
+.chip-correction { font-size: 0.722rem; color: var(--error); display: block; margin-top: 2px; font-family: var(--font-sans); font-weight: 400; }
+.sort-summary { margin-top: 16px; padding: 16px; border-radius: 6px; font-weight: 600; text-align: center; }
+.sort-summary.all-correct { background: var(--success-bg); color: var(--success); }
+.sort-summary.has-errors { background: var(--error-bg); color: var(--error); }
+.wave-message { text-align: center; padding: 24px; color: var(--success); font-weight: 600; font-size: 1.111rem; }
+/* Step 3 - Matching */
+.match-columns { display: flex; gap: 16px; justify-content: center; }
+.match-col { display: flex; flex-direction: column; gap: 10px; flex: 1; max-width: 200px; }
+.match-card {
+  padding: 14px 12px; text-align: center; cursor: pointer; border-radius: 10px;
+  transition: transform 100ms, background 150ms; border: 2px solid var(--border-card);
+  background: var(--bg-card); height: 52px; display: flex; align-items: center;
+  justify-content: center; font-weight: 600; line-height: 1.2;
+}
+.match-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.match-card.selected { border-color: var(--accent); background: var(--accent-light); }
+.match-card.paired { opacity: 0.85; }
+.match-card.correct { border-color: var(--success); background: var(--success-bg); }
+.match-card.incorrect { border-color: var(--error); background: var(--error-bg); }
+.match-card .en { font-family: var(--font-mono); font-size: 1.056rem; font-weight: 600; }
+.match-card .ru { font-size: 1.056rem; font-weight: 400; }
+.match-summary { margin-top: 16px; text-align: center; font-weight: 600; padding: 12px; border-radius: 6px; }
+.match-correction { font-size: 0.778rem; color: var(--error); margin-top: 4px; }
+/* Step 4 - Recognition */
+.recognition-card { text-align: center; padding: 32px 16px; }
+.recognition-form { margin-bottom: 8px; }
+.recognition-question { margin-bottom: 24px; font-size: 1rem; color: var(--text-secondary); }
+.recognition-special { font-size: 0.833rem; color: var(--accent); margin-bottom: 16px; }
+.recognition-options { display: flex; flex-direction: column; gap: 10px; }
+.recognition-opt {
+  padding: 16px; border: 2px solid var(--border-card); border-radius: 6px;
+  background: var(--bg-card); cursor: pointer; font-family: var(--font-mono);
+  font-size: 1.111rem; font-weight: 600; text-align: center; min-height: 52px;
+  transition: transform 100ms, background 150ms, border-color 150ms;
+}
+.recognition-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.recognition-opt:active { transform: scale(0.97); }
+.recognition-opt.correct { border-color: var(--success); background: var(--success-bg); }
+.recognition-opt.incorrect { border-color: var(--error); background: var(--error-bg); }
+/* Step 5 - Assembly */
+.assembly-card { text-align: center; }
+.assembly-given { margin-bottom: 24px; }
+.assembly-slots { display: flex; gap: 16px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
+.assembly-slot {
+  border: 2px dashed var(--star-empty); border-radius: 6px; padding: 14px 20px;
+  min-width: 140px; min-height: 56px; cursor: pointer; text-align: center;
+  transition: border-color 150ms, background 150ms; flex: 1; max-width: 220px;
+}
+.assembly-slot.active { border-color: var(--accent); border-style: solid; }
+.assembly-slot.filled { border-style: solid; border-color: var(--border-card); background: var(--accent-light); }
+.assembly-slot.correct { border-color: var(--success); background: var(--success-bg); }
+.assembly-slot.incorrect { border-color: var(--error); background: var(--error-bg); }
+.slot-label { font-size: 0.778rem; color: var(--text-secondary); margin-bottom: 4px; }
+.slot-value { font-family: var(--font-mono); font-size: 1.111rem; font-weight: 600; }
+.slot-correction { font-size: 0.778rem; color: var(--error); margin-top: 4px; }
+.pieces-bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 24px; }
+.piece-btn {
+  padding: 12px 20px; border: 2px solid var(--border-card); border-radius: 6px;
+  background: var(--bg-card); cursor: pointer; font-family: var(--font-mono);
+  font-size: 1rem; font-weight: 600; min-height: 48px;
+  transition: transform 100ms, opacity 150ms;
+}
+.piece-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.piece-btn:active { transform: scale(0.97); }
+.piece-btn.used { opacity: 0.3; pointer-events: none; }
+.assembly-feedback { margin-top: 16px; padding: 12px 16px; border-radius: 6px; font-weight: 600; text-align: center; }
+.assembly-feedback.is-correct { background: var(--success-bg); color: var(--success); }
+.assembly-feedback.is-incorrect { background: var(--error-bg); color: var(--error); }
+/* Step 6 - Flashcard */
+.flashcard { text-align: center; padding: 32px 16px; }
+.flashcard-ru { font-size: 1.333rem; font-weight: 600; margin-bottom: 32px; padding: 24px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; box-shadow: var(--shadow-card); }
+.flashcard-answer { margin-bottom: 24px; animation: fadeIn 200ms ease; }
+.flashcard-answer .verb-form { margin-bottom: 4px; display: block; }
+.flashcard-answer .ipa { display: block; margin-bottom: 8px; }
+.self-assess-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 420px) { .self-assess-btns { flex-direction: column; } }
+.assess-btn {
+  flex: 1; min-height: 64px; border-radius: 6px; font-weight: 600; font-size: 1rem;
+  cursor: pointer; transition: transform 100ms, background 150ms; border: 2px solid;
+  font-family: var(--font-sans); min-width: 100px;
+}
+.assess-btn:active { transform: scale(0.97); }
+.assess-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.assess-easy { background: var(--easy-bg); border-color: var(--easy-border); color: var(--easy-text); }
+.assess-easy:hover { background: #DDE8D0; }
+.assess-hard { background: var(--hard-bg); border-color: var(--hard-border); color: var(--hard-text); }
+.assess-hard:hover { background: #F0E5C8; }
+.assess-fail { background: var(--fail-bg); border-color: var(--fail-border); color: var(--fail-text); }
+.assess-fail:hover { background: #EDd5CC; }
+/* Result */
+.result-screen { padding: 32px 0; }
+.result-stars { display: flex; gap: 8px; justify-content: center; margin: 16px 0 8px; }
+.result-stars .star-icon { width: 48px; height: 48px; }
+.result-desc { text-align: center; color: var(--text-secondary); margin-bottom: 24px; }
+.report-card { border: 2px solid var(--accent); }
+.report-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-card); font-size: 0.889rem; gap: 8px; }
+.report-row:last-child { border-bottom: none; }
+.report-label { color: var(--text-secondary); font-weight: 600; white-space: nowrap; }
+.report-value { text-align: right; }
+.result-btns { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+/* Confetti */
+.confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 200; overflow: hidden; }
+.confetti-piece {
+  position: absolute; width: 8px; height: 12px; top: -20px;
+  animation: confettiFall 1500ms ease-in forwards;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+/* Settings */
+.settings-section { margin-bottom: 20px; }
+.settings-section h3 { margin-bottom: 8px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+.toggle-switch {
+  position: relative; width: 52px; height: 28px; background: var(--border-card);
+  border-radius: 14px; cursor: pointer; transition: background 200ms; border: none;
+}
+.toggle-switch::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px;
+  background: var(--bg-card); border-radius: 50%; transition: left 200ms; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch.on { background: var(--accent); }
+.toggle-switch.on::after { left: 26px; }
+.toggle-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.reset-select { padding: 10px; border: 1px solid var(--border-card); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); font-size: 0.889rem; width: 100%; margin-bottom: 8px; }
+.modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+[lang="en"] { font-family: var(--font-mono); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+</style>
+</head>
+<body>
+
+<div id="welcome" class="screen">
+  <div class="welcome-inner container">
+    <h1>COMMON IRREGULAR VERBS</h1>
+    <p class="subtitle">Тренажёр английских неправильных глаголов</p>
+    <div class="name-field">
+      <label for="name-input">Ваше имя</label>
+      <input type="text" id="name-input" placeholder="Например: Иван" maxlength="30" autofocus>
+    </div>
+    <p class="name-hint">Имя нужно для отчёта о выполнении домашнего задания</p>
+    <button class="btn btn-primary" id="start-btn" disabled>Начать</button>
+  </div>
+</div>
+
+<div id="menu" class="screen">
+  <div class="container">
+    <div class="menu-header">
+      <h2 id="greeting"></h2>
+      <button class="settings-btn" id="open-settings" aria-label="Настройки">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+    <div class="units-section">
+      <h2>Юниты</h2>
+      <div class="units-grid" id="units-grid"></div>
+    </div>
+    <div class="menu-footer" id="menu-footer"></div>
+  </div>
+</div>
+
+<div id="unit-screen" class="screen">
+  <div class="container">
+    <div class="unit-header">
+      <div class="unit-header-row">
+        <button class="unit-back-btn" id="unit-back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          На главную
+        </button>
+        <div class="unit-header-center">
+          <h2 id="unit-title"></h2>
+          <div class="unit-header-subtitle" id="unit-subtitle"></div>
+        </div>
+        <span class="step-indicator" id="step-indicator"></span>
+      </div>
+      <div class="unit-progress">
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="step-progress" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="step-content" id="step-content" aria-live="polite"></div>
+  </div>
+</div>
+
+<div id="result-screen" class="screen">
+  <div class="container result-screen" id="result-content"></div>
+</div>
+
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <h2 style="margin-bottom:20px">Настройки</h2>
+    <div class="settings-section">
+      <h3>Изменить имя</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input type="text" id="settings-name" maxlength="30" style="flex:1;min-width:0;padding:10px;border:1px solid var(--border-card);border-radius:6px;background:var(--bg-card);color:var(--text-primary);font-size:0.889rem">
+        <button class="btn btn-secondary" id="save-name-btn" style="width:auto;padding:10px 16px;min-height:auto;flex-shrink:0">Сохранить</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="toggle-row">
+        <span>Тёмная тема</span>
+        <button class="toggle-switch" id="dark-toggle" role="switch" aria-checked="false"></button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>Сбросить прогресс юнита</h3>
+      <select class="reset-select" id="reset-unit-select">
+        <option value="1">Юнит 1</option><option value="2">Юнит 2</option>
+        <option value="3">Юнит 3</option><option value="4">Юнит 4</option>
+      </select>
+      <button class="btn btn-danger" id="reset-unit-btn" style="font-size:0.889rem;padding:10px;min-height:44px">Сбросить прогресс юнита</button>
+    </div>
+    <div class="settings-section">
+      <button class="btn btn-danger" id="reset-all-btn" style="font-size:0.889rem;padding:10px;min-height:44px">Сбросить весь прогресс</button>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" id="close-settings">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h2 style="margin-bottom:12px">Сбросить прогресс?</h2>
+    <p style="margin-bottom:20px;color:var(--text-secondary)">Это действие нельзя отменить. Прогресс юнита (или всего тренажёра) будет полностью удалён.</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-danger" id="confirm-yes" style="flex:1">Да, сбросить</button>
+      <button class="btn btn-secondary" id="confirm-no" style="flex:1">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div id="ls-warning-container"></div>
+
+<script>
+'use strict';
+const VERBS=[{id:"cost",v1:"cost",v2:"cost",v3:"cost",ipa1:"/kɒst/",ipa2:"/kɒst/",ipa3:"/kɒst/",ru:"стоить",group:1,subgroup:"1"},{id:"cut",v1:"cut",v2:"cut",v3:"cut",ipa1:"/kʌt/",ipa2:"/kʌt/",ipa3:"/kʌt/",ru:"резать",group:1,subgroup:"1"},{id:"hit",v1:"hit",v2:"hit",v3:"hit",ipa1:"/hɪt/",ipa2:"/hɪt/",ipa3:"/hɪt/",ru:"ударять",group:1,subgroup:"1"},{id:"hurt",v1:"hurt",v2:"hurt",v3:"hurt",ipa1:"/hɜːt/",ipa2:"/hɜːt/",ipa3:"/hɜːt/",ru:"причинять боль",group:1,subgroup:"1"},{id:"let",v1:"let",v2:"let",v3:"let",ipa1:"/let/",ipa2:"/let/",ipa3:"/let/",ru:"позволять",group:1,subgroup:"1"},{id:"put",v1:"put",v2:"put",v3:"put",ipa1:"/pʊt/",ipa2:"/pʊt/",ipa3:"/pʊt/",ru:"класть, ставить",group:1,subgroup:"1"},{id:"set",v1:"set",v2:"set",v3:"set",ipa1:"/set/",ipa2:"/set/",ipa3:"/set/",ru:"устанавливать, ставить",group:1,subgroup:"1"},{id:"shut",v1:"shut",v2:"shut",v3:"shut",ipa1:"/ʃʌt/",ipa2:"/ʃʌt/",ipa3:"/ʃʌt/",ru:"закрывать",group:1,subgroup:"1"},{id:"bring",v1:"bring",v2:"brought",v3:"brought",ipa1:"/brɪŋ/",ipa2:"/brɔːt/",ipa3:"/brɔːt/",ru:"приносить",group:2,subgroup:"2.1"},{id:"buy",v1:"buy",v2:"bought",v3:"bought",ipa1:"/baɪ/",ipa2:"/bɔːt/",ipa3:"/bɔːt/",ru:"покупать",group:2,subgroup:"2.1"},{id:"catch",v1:"catch",v2:"caught",v3:"caught",ipa1:"/kætʃ/",ipa2:"/kɔːt/",ipa3:"/kɔːt/",ru:"ловить",group:2,subgroup:"2.1"},{id:"fight",v1:"fight",v2:"fought",v3:"fought",ipa1:"/faɪt/",ipa2:"/fɔːt/",ipa3:"/fɔːt/",ru:"сражаться, драться",group:2,subgroup:"2.1"},{id:"teach",v1:"teach",v2:"taught",v3:"taught",ipa1:"/tiːtʃ/",ipa2:"/tɔːt/",ipa3:"/tɔːt/",ru:"учить, преподавать",group:2,subgroup:"2.1"},{id:"think",v1:"think",v2:"thought",v3:"thought",ipa1:"/θɪŋk/",ipa2:"/θɔːt/",ipa3:"/θɔːt/",ru:"думать",group:2,subgroup:"2.1"},{id:"feel",v1:"feel",v2:"felt",v3:"felt",ipa1:"/fiːl/",ipa2:"/felt/",ipa3:"/felt/",ru:"чувствовать",group:2,subgroup:"2.2"},{id:"keep",v1:"keep",v2:"kept",v3:"kept",ipa1:"/kiːp/",ipa2:"/kept/",ipa3:"/kept/",ru:"хранить, держать",group:2,subgroup:"2.2"},{id:"leave",v1:"leave",v2:"left",v3:"left",ipa1:"/liːv/",ipa2:"/left/",ipa3:"/left/",ru:"уходить, оставлять",group:2,subgroup:"2.2"},{id:"meet",v1:"meet",v2:"met",v3:"met",ipa1:"/miːt/",ipa2:"/met/",ipa3:"/met/",ru:"встречать",group:2,subgroup:"2.2"},{id:"sleep",v1:"sleep",v2:"slept",v3:"slept",ipa1:"/sliːp/",ipa2:"/slept/",ipa3:"/slept/",ru:"спать",group:2,subgroup:"2.2"},{id:"build",v1:"build",v2:"built",v3:"built",ipa1:"/bɪld/",ipa2:"/bɪlt/",ipa3:"/bɪlt/",ru:"строить",group:2,subgroup:"2.3"},{id:"lend",v1:"lend",v2:"lent",v3:"lent",ipa1:"/lend/",ipa2:"/lent/",ipa3:"/lent/",ru:"одалживать, давать в долг",group:2,subgroup:"2.3"},{id:"mean",v1:"mean",v2:"meant",v3:"meant",ipa1:"/miːn/",ipa2:"/ment/",ipa3:"/ment/",ru:"значить, иметь в виду",group:2,subgroup:"2.3"},{id:"send",v1:"send",v2:"sent",v3:"sent",ipa1:"/send/",ipa2:"/sent/",ipa3:"/sent/",ru:"посылать",group:2,subgroup:"2.3"},{id:"spend",v1:"spend",v2:"spent",v3:"spent",ipa1:"/spend/",ipa2:"/spent/",ipa3:"/spent/",ru:"тратить, проводить (время)",group:2,subgroup:"2.3"},{id:"sell",v1:"sell",v2:"sold",v3:"sold",ipa1:"/sel/",ipa2:"/səʊld/",ipa3:"/səʊld/",ru:"продавать",group:2,subgroup:"2.4"},{id:"tell",v1:"tell",v2:"told",v3:"told",ipa1:"/tel/",ipa2:"/təʊld/",ipa3:"/təʊld/",ru:"рассказывать, говорить",group:2,subgroup:"2.4"},{id:"have",v1:"have",v2:"had",v3:"had",ipa1:"/hæv/",ipa2:"/hæd/",ipa3:"/hæd/",ru:"иметь",group:2,subgroup:"2.5"},{id:"hear",v1:"hear",v2:"heard",v3:"heard",ipa1:"/hɪə/",ipa2:"/hɜːd/",ipa3:"/hɜːd/",ru:"слышать",group:2,subgroup:"2.5"},{id:"make",v1:"make",v2:"made",v3:"made",ipa1:"/meɪk/",ipa2:"/meɪd/",ipa3:"/meɪd/",ru:"делать, заставлять",group:2,subgroup:"2.5"},{id:"pay",v1:"pay",v2:"paid",v3:"paid",ipa1:"/peɪ/",ipa2:"/peɪd/",ipa3:"/peɪd/",ru:"платить",group:2,subgroup:"2.5"},{id:"say",v1:"say",v2:"said",v3:"said",ipa1:"/seɪ/",ipa2:"/sed/",ipa3:"/sed/",ru:"сказать, говорить",group:2,subgroup:"2.5"},{id:"stand",v1:"stand",v2:"stood",v3:"stood",ipa1:"/stænd/",ipa2:"/stʊd/",ipa3:"/stʊd/",ru:"стоять",group:2,subgroup:"2.6"},{id:"understand",v1:"understand",v2:"understood",v3:"understood",ipa1:"/ˌʌndəˈstænd/",ipa2:"/ˌʌndəˈstʊd/",ipa3:"/ˌʌndəˈstʊd/",ru:"понимать",group:2,subgroup:"2.6"},{id:"find",v1:"find",v2:"found",v3:"found",ipa1:"/faɪnd/",ipa2:"/faʊnd/",ipa3:"/faʊnd/",ru:"находить",group:2,subgroup:"2.7"},{id:"get",v1:"get",v2:"got",v3:"got",ipa1:"/ɡet/",ipa2:"/ɡɒt/",ipa3:"/ɡɒt/",ru:"получать",group:2,subgroup:"2.7"},{id:"hold",v1:"hold",v2:"held",v3:"held",ipa1:"/həʊld/",ipa2:"/held/",ipa3:"/held/",ru:"держать",group:2,subgroup:"2.7"},{id:"light",v1:"light",v2:"lit",v3:"lit",ipa1:"/laɪt/",ipa2:"/lɪt/",ipa3:"/lɪt/",ru:"зажигать, освещать",group:2,subgroup:"2.7"},{id:"lose",v1:"lose",v2:"lost",v3:"lost",ipa1:"/luːz/",ipa2:"/lɒst/",ipa3:"/lɒst/",ru:"терять",group:2,subgroup:"2.7"},{id:"read",v1:"read",v2:"read",v3:"read",ipa1:"/riːd/",ipa2:"/red/",ipa3:"/red/",ru:"читать",group:2,subgroup:"2.7"},{id:"shoot",v1:"shoot",v2:"shot",v3:"shot",ipa1:"/ʃuːt/",ipa2:"/ʃɒt/",ipa3:"/ʃɒt/",ru:"стрелять",group:2,subgroup:"2.7"},{id:"sit",v1:"sit",v2:"sat",v3:"sat",ipa1:"/sɪt/",ipa2:"/sæt/",ipa3:"/sæt/",ru:"сидеть",group:2,subgroup:"2.7"},{id:"win",v1:"win",v2:"won",v3:"won",ipa1:"/wɪn/",ipa2:"/wʌn/",ipa3:"/wʌn/",ru:"выигрывать, побеждать",group:2,subgroup:"2.7"},{id:"become",v1:"become",v2:"became",v3:"become",ipa1:"/bɪˈkʌm/",ipa2:"/bɪˈkeɪm/",ipa3:"/bɪˈkʌm/",ru:"становиться",group:3,subgroup:"3"},{id:"come",v1:"come",v2:"came",v3:"come",ipa1:"/kʌm/",ipa2:"/keɪm/",ipa3:"/kʌm/",ru:"приходить",group:3,subgroup:"3"},{id:"run",v1:"run",v2:"ran",v3:"run",ipa1:"/rʌn/",ipa2:"/ræn/",ipa3:"/rʌn/",ru:"бегать, бежать",group:3,subgroup:"3"},{id:"begin",v1:"begin",v2:"began",v3:"begun",ipa1:"/bɪˈɡɪn/",ipa2:"/bɪˈɡæn/",ipa3:"/bɪˈɡʌn/",ru:"начинать",group:4,subgroup:"4.1"},{id:"drink",v1:"drink",v2:"drank",v3:"drunk",ipa1:"/drɪŋk/",ipa2:"/dræŋk/",ipa3:"/drʌŋk/",ru:"пить",group:4,subgroup:"4.1"},{id:"ring",v1:"ring",v2:"rang",v3:"rung",ipa1:"/rɪŋ/",ipa2:"/ræŋ/",ipa3:"/rʌŋ/",ru:"звонить, звенеть",group:4,subgroup:"4.1"},{id:"sing",v1:"sing",v2:"sang",v3:"sung",ipa1:"/sɪŋ/",ipa2:"/sæŋ/",ipa3:"/sʌŋ/",ru:"петь",group:4,subgroup:"4.1"},{id:"swim",v1:"swim",v2:"swam",v3:"swum",ipa1:"/swɪm/",ipa2:"/swæm/",ipa3:"/swʌm/",ru:"плавать",group:4,subgroup:"4.1"},{id:"bite",v1:"bite",v2:"bit",v3:"bitten",ipa1:"/baɪt/",ipa2:"/bɪt/",ipa3:"/ˈbɪtn/",ru:"кусать",group:4,subgroup:"4.2"},{id:"hide",v1:"hide",v2:"hid",v3:"hidden",ipa1:"/haɪd/",ipa2:"/hɪd/",ipa3:"/ˈhɪdn/",ru:"прятать(ся)",group:4,subgroup:"4.2"},{id:"drive",v1:"drive",v2:"drove",v3:"driven",ipa1:"/draɪv/",ipa2:"/drəʊv/",ipa3:"/ˈdrɪvn/",ru:"водить (машину), ехать",group:4,subgroup:"4.2"},{id:"ride",v1:"ride",v2:"rode",v3:"ridden",ipa1:"/raɪd/",ipa2:"/rəʊd/",ipa3:"/ˈrɪdn/",ru:"ездить верхом, кататься",group:4,subgroup:"4.2"},{id:"rise",v1:"rise",v2:"rose",v3:"risen",ipa1:"/raɪz/",ipa2:"/rəʊz/",ipa3:"/ˈrɪzn/",ru:"подниматься, восходить",group:4,subgroup:"4.2"},{id:"write",v1:"write",v2:"wrote",v3:"written",ipa1:"/raɪt/",ipa2:"/rəʊt/",ipa3:"/ˈrɪtn/",ru:"писать",group:4,subgroup:"4.2"},{id:"break",v1:"break",v2:"broke",v3:"broken",ipa1:"/breɪk/",ipa2:"/brəʊk/",ipa3:"/ˈbrəʊkən/",ru:"ломать, разбивать",group:4,subgroup:"4.3"},{id:"choose",v1:"choose",v2:"chose",v3:"chosen",ipa1:"/tʃuːz/",ipa2:"/tʃəʊz/",ipa3:"/ˈtʃəʊzn/",ru:"выбирать",group:4,subgroup:"4.3"},{id:"speak",v1:"speak",v2:"spoke",v3:"spoken",ipa1:"/spiːk/",ipa2:"/spəʊk/",ipa3:"/ˈspəʊkən/",ru:"говорить, разговаривать",group:4,subgroup:"4.3"},{id:"wake",v1:"wake",v2:"woke",v3:"woken",ipa1:"/weɪk/",ipa2:"/wəʊk/",ipa3:"/ˈwəʊkən/",ru:"просыпаться, будить",group:4,subgroup:"4.3"},{id:"blow",v1:"blow",v2:"blew",v3:"blown",ipa1:"/bləʊ/",ipa2:"/bluː/",ipa3:"/bləʊn/",ru:"дуть",group:4,subgroup:"4.4"},{id:"draw",v1:"draw",v2:"drew",v3:"drawn",ipa1:"/drɔː/",ipa2:"/druː/",ipa3:"/drɔːn/",ru:"рисовать, тянуть",group:4,subgroup:"4.4"},{id:"fly",v1:"fly",v2:"flew",v3:"flown",ipa1:"/flaɪ/",ipa2:"/fluː/",ipa3:"/fləʊn/",ru:"летать",group:4,subgroup:"4.4"},{id:"grow",v1:"grow",v2:"grew",v3:"grown",ipa1:"/ɡrəʊ/",ipa2:"/ɡruː/",ipa3:"/ɡrəʊn/",ru:"расти, выращивать",group:4,subgroup:"4.4"},{id:"know",v1:"know",v2:"knew",v3:"known",ipa1:"/nəʊ/",ipa2:"/njuː/",ipa3:"/nəʊn/",ru:"знать",group:4,subgroup:"4.4"},{id:"show",v1:"show",v2:"showed",v3:"shown",ipa1:"/ʃəʊ/",ipa2:"/ʃəʊd/",ipa3:"/ʃəʊn/",ru:"показывать",group:4,subgroup:"4.4"},{id:"tear",v1:"tear",v2:"tore",v3:"torn",ipa1:"/teə/",ipa2:"/tɔː/",ipa3:"/tɔːn/",ru:"рвать, разрывать",group:4,subgroup:"4.5"},{id:"wear",v1:"wear",v2:"wore",v3:"worn",ipa1:"/weə/",ipa2:"/wɔː/",ipa3:"/wɔːn/",ru:"носить (одежду)",group:4,subgroup:"4.5"},{id:"do",v1:"do",v2:"did",v3:"done",ipa1:"/duː/",ipa2:"/dɪd/",ipa3:"/dʌn/",ru:"делать",group:4,subgroup:"4.6"},{id:"eat",v1:"eat",v2:"ate",v3:"eaten",ipa1:"/iːt/",ipa2:"/eɪt/",ipa3:"/ˈiːtn/",ru:"есть",group:4,subgroup:"4.6"},{id:"fall",v1:"fall",v2:"fell",v3:"fallen",ipa1:"/fɔːl/",ipa2:"/fel/",ipa3:"/ˈfɔːlən/",ru:"падать",group:4,subgroup:"4.6"},{id:"forget",v1:"forget",v2:"forgot",v3:"forgotten",ipa1:"/fəˈɡet/",ipa2:"/fəˈɡɒt/",ipa3:"/fəˈɡɒtn/",ru:"забывать",group:4,subgroup:"4.6"},{id:"give",v1:"give",v2:"gave",v3:"given",ipa1:"/ɡɪv/",ipa2:"/ɡeɪv/",ipa3:"/ˈɡɪvn/",ru:"давать",group:4,subgroup:"4.6"},{id:"go",v1:"go",v2:"went",v3:"gone",ipa1:"/ɡəʊ/",ipa2:"/went/",ipa3:"/ɡɒn/",ru:"идти, ехать",group:4,subgroup:"4.6"},{id:"see",v1:"see",v2:"saw",v3:"seen",ipa1:"/siː/",ipa2:"/sɔː/",ipa3:"/siːn/",ru:"видеть",group:4,subgroup:"4.6"},{id:"take",v1:"take",v2:"took",v3:"taken",ipa1:"/teɪk/",ipa2:"/tʊk/",ipa3:"/ˈteɪkən/",ru:"брать, взять",group:4,subgroup:"4.6"}];
+
+const UNITS=[
+{id:1,title:"Все три формы одинаковые",subtitle:"cost, cut, hit, put…",intro:"У этих глаголов V1, V2 и V3 пишутся и звучат одинаково. Самая лёгкая группа.",verbCount:8,hasSubgroups:false},
+{id:2,title:"Вторая и третья формы одинаковые",subtitle:"bring → brought → brought, feel → felt → felt…",intro:"У этих глаголов V2 и V3 совпадают, отличаясь только от V1. Внутри юнита глаголы разделены на 7 подгрупп по тому, как именно образуются V2/V3.",verbCount:34,hasSubgroups:true,subgroups:[{id:"2.1",title:"Окончание -ought / -aught",hint:"звучит как «бр-ОТ», «к-ОТ»",verbCount:6},{id:"2.2",title:"Корневая гласная укорачивается, добавляется -t",hint:"feel → felt, keep → kept",verbCount:5},{id:"2.3",title:"Концовка -d / -n превращается в -t / -nt",hint:"build → built, send → sent",verbCount:5},{id:"2.4",title:"Концовка -ell превращается в -old",hint:"sell → sold, tell → told",verbCount:2},{id:"2.5",title:"Добавляется -d (иногда меняется звук)",hint:"make → made, say → said /sed/",verbCount:5},{id:"2.6",title:"Концовка -and превращается в -ood",hint:"stand → stood, understand → understood",verbCount:2},{id:"2.7",title:"Особенные — не попали ни в одну подгруппу",hint:"find, get, hold, read, win…",verbCount:9}]},
+{id:3,title:"Первая и третья формы одинаковые",subtitle:"become → became → become, come → came → come, run → ran → run",intro:"У этих глаголов V1 и V3 совпадают, а V2 другая. Группа маленькая — всего три глагола, но запомнить чередование важно: легко спутать V2 и V3.",verbCount:3,hasSubgroups:false},
+{id:4,title:"Все три формы разные",subtitle:"begin → began → begun, drive → drove → driven…",intro:"Самая большая и самая сложная группа: все три формы отличаются. Глаголы разделены на 6 подгрупп по чередованию гласных и окончаниям.",verbCount:31,hasSubgroups:true,subgroups:[{id:"4.1",title:"Чередование -i- → -a- → -u-",hint:"drink → drank → drunk",verbCount:5},{id:"4.2",title:"Чередование -i- → -i-/-o- → -en",hint:"drive → drove → driven, bite → bit → bitten",verbCount:6},{id:"4.3",title:"Концовка -oke / -ose → -oken / -osen",hint:"break → broke → broken, choose → chose → chosen",verbCount:4},{id:"4.4",title:"Концовка -ow / -aw / -y → -ew → -own / -awn",hint:"blow → blew → blown, draw → drew → drawn",verbCount:6},{id:"4.5",title:"Концовка -ear → -ore → -orn",hint:"wear → wore → worn, tear → tore → torn",verbCount:2},{id:"4.6",title:"Особенные — не попали ни в одну подгруппу",hint:"do, eat, fall, give, go, see, take…",verbCount:8}]}
+];
+
+const LS_KEY='irreg_verbs_trainer_v2';
+let state=null;
+let lsAvailable=true;
+let currentUnit=null;
+let currentStep=0;
+let weakVerbs=new Set();
+let stepState={};
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function getUnitVerbs(unitId){return VERBS.filter(v=>v.group===unitId);}
+function getUnit(id){return UNITS.find(u=>u.id===id);}
+function starSVG(filled,size){const c=filled?'var(--star-filled)':'none';const s=filled?'var(--star-filled)':'var(--star-empty)';return `<svg class="star-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${c}" stroke="${s}" stroke-width="2" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;}
+function starsHTML(count,size){let h='';for(let i=0;i<3;i++)h+=starSVG(i<count,size);return h;}
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw){state=null;return;}
+    state=JSON.parse(raw);
+    if(!state||state.version!==2){state=null;}
+  }catch(e){state=null;try{localStorage.setItem(LS_KEY+'_corrupted',localStorage.getItem(LS_KEY));}catch(e2){}try{localStorage.removeItem(LS_KEY);}catch(e3){}}
+}
+function saveState(){
+  if(!lsAvailable||!state)return;
+  try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}
+}
+function initState(name){
+  state={version:2,name:name.trim().slice(0,30),createdAt:new Date().toISOString(),settings:{darkMode:false},units:{}};
+  saveState();
+}
+function checkLS(){try{localStorage.setItem('__test','1');localStorage.removeItem('__test');return true;}catch(e){return false;}}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('is-active','fade-in'));
+  const el=document.getElementById(id);
+  el.classList.add('is-active','fade-in');
+}
+
+function applyTheme(){
+  const dark=state&&state.settings&&state.settings.darkMode;
+  document.documentElement.setAttribute('data-theme',dark?'dark':'');
+  const tog=document.getElementById('dark-toggle');
+  if(tog){tog.classList.toggle('on',!!dark);tog.setAttribute('aria-checked',!!dark);}
+}
+
+function renderWelcome(){showScreen('welcome');document.getElementById('name-input').focus();}
+
+function renderMenu(){
+  showScreen('menu');
+  document.getElementById('greeting').textContent='Привет, '+state.name+'!';
+  const grid=document.getElementById('units-grid');
+  grid.innerHTML='';
+  UNITS.forEach(u=>{
+    const ud=state.units[u.id]||{};
+    const stars=ud.stars||0;
+    const btn=document.createElement('button');
+    btn.className='unit-card';
+    btn.setAttribute('aria-label','Юнит '+u.id+': '+u.title);
+    btn.innerHTML=`<div class="unit-num">${u.id}</div><div class="unit-info"><div class="unit-title">${u.title}</div></div><div class="unit-stars">${starsHTML(stars,28)}</div>`;
+    btn.addEventListener('click',()=>startUnit(u.id));
+    grid.appendChild(btn);
+  });
+  let mastered=0;
+  for(let uid=1;uid<=4;uid++){const ud=state.units[uid];if(ud&&ud.easyVerbs)mastered+=ud.easyVerbs.length;}
+  const footer=document.getElementById('menu-footer');
+  footer.innerHTML='Освоено: '+mastered+' из 76 глаголов';
+  if(!lsAvailable)footer.innerHTML+='<div class="ls-warning">Внимание: прогресс не сохраняется. Возможно, включён приватный режим браузера.</div>';
+  document.getElementById('settings-name').value=state.name;
+}
+function startUnit(unitId){
+  currentUnit=unitId;
+  const ud=state.units[unitId];
+  if(ud&&ud.completed&&ud.lastResult){
+    showSavedResult(unitId);return;
+  }
+  beginUnit(unitId);
+}
+function beginUnit(unitId){
+  currentUnit=unitId;currentStep=1;weakVerbs=new Set();stepState={};
+  showScreen('unit-screen');
+  const u=getUnit(unitId);
+  document.getElementById('unit-title').textContent='Юнит '+unitId;
+  document.getElementById('unit-subtitle').textContent=u.title;
+  renderStep();
+}
+function renderStep(){
+  document.getElementById('step-indicator').textContent=currentStep+'/6';
+  document.getElementById('step-progress').style.width='0%';
+  const c=document.getElementById('step-content');
+  c.innerHTML='';
+  switch(currentStep){
+    case 1:renderStep1(c);break;case 2:renderStep2(c);break;case 3:renderStep3(c);break;
+    case 4:renderStep4(c);break;case 5:renderStep5(c);break;case 6:renderStep6(c);break;
+  }
+  window.scrollTo(0,0);
+}
+function setProgress(pct){document.getElementById('step-progress').style.width=Math.min(100,Math.max(0,pct))+'%';}
+function nextStep(){
+  if(currentStep<6){currentStep++;renderStep();}
+  else{finishUnit();}
+}
+
+// STEP 1
+function renderStep1(container){
+  const u=getUnit(currentUnit);const verbs=getUnitVerbs(currentUnit);
+  let html='<h2 class="step-title">Шаг 1 из 6 · Знакомство</h2>';
+  if(u.hasSubgroups){
+    html+='<p class="step-instruction">Прочитайте глаголы вслух. Обратите внимание, как они разбиты на подгруппы по паттернам — это поможет на следующем шаге.</p>';
+    u.subgroups.forEach(sg=>{
+      const sgVerbs=verbs.filter(v=>v.subgroup===sg.id);
+      html+='<div class="subgroup-section"><div class="subgroup-header"><h3>'+sg.title+'</h3><div class="subgroup-hint">'+sg.hint+'</div></div><div class="verb-cards-list">';
+      sgVerbs.forEach(v=>{html+=verbCardHTML(v);});
+      html+='</div></div>';
+    });
+  }else{
+    html+='<p class="step-instruction">Прочитайте глаголы вслух. Постарайтесь запомнить их формы и произношение.</p>';
+    html+='<div class="intro-text">'+u.intro+'</div><div class="verb-cards-list">';
+    verbs.forEach(v=>{html+=verbCardHTML(v);});
+    html+='</div>';
+  }
+  html+='<div style="margin-top:24px"><button class="btn btn-primary" id="step1-next">Готово, дальше →</button></div>';
+  container.innerHTML=html;
+  document.getElementById('step1-next').addEventListener('click',nextStep);
+}
+function verbCardHTML(v){
+  let note='';
+  if(v.id==='read')note='<div class="read-note"><em>Внимание:</em> все три формы пишутся одинаково, но V2 и V3 произносятся /red/</div>';
+  return `<div class="card-verb intro-verb-card"><div class="verb-forms"><span class="verb-form" lang="en">${v.v1} — ${v.v2} — ${v.v3}</span></div><div class="verb-ipas"><span class="ipa" lang="en">${v.ipa1} — ${v.ipa2} — ${v.ipa3}</span></div><div class="verb-ru">${v.ru}</div>${note}</div>`;
+}
+
+// STEP 2
+function renderStep2(container){
+  const u=getUnit(currentUnit);
+  const verbs=getUnitVerbs(currentUnit);
+  if(u.hasSubgroups)renderStep2Subgroups(container,u,verbs);
+  else renderStep2Simple(container,u,verbs);
+}
+function renderStep2Subgroups(container,unit,verbs){
+  const totalVerbs=verbs.length;
+  const needWaves=totalVerbs>12;
+  let waves;
+  if(needWaves){
+    const half=Math.ceil(totalVerbs/2);
+    const w1=[],w2=[];
+    const bySubgroup={};
+    unit.subgroups.forEach(sg=>{bySubgroup[sg.id]=shuffle(verbs.filter(v=>v.subgroup===sg.id));});
+    unit.subgroups.forEach(sg=>{
+      const sv=bySubgroup[sg.id];
+      if(sv.length>0){w1.push(sv[0]);if(sv.length>1)w2.push(sv[1]);}
+      for(let i=2;i<sv.length;i++){
+        if(w1.length<half)w1.push(sv[i]);else w2.push(sv[i]);
+      }
+    });
+    waves=[shuffle(w1),shuffle(w2)];
+  }else{
+    waves=[shuffle(verbs)];
+  }
+  stepState.waves=waves;stepState.waveIdx=0;stepState.checked=false;
+  renderSortWave(container,unit);
+}
+function renderSortWave(container,unit){
+  const wave=stepState.waves[stepState.waveIdx];
+  const isLast=stepState.waveIdx>=stepState.waves.length-1;
+  const waveLabel=stepState.waves.length>1?(' (часть '+(stepState.waveIdx+1)+' из '+stepState.waves.length+')'):'';
+  let html='<h2 class="step-title">Шаг 2 из 6 · Сортировка'+waveLabel+'</h2>';
+  html+='<p class="step-instruction">Распределите глаголы по подгруппам в зависимости от того, как у них образуются 2-я и 3-я формы.</p>';
+  html+='<div class="pool-section"><p class="pool-hint">Нажмите на глагол, затем на нужную подгруппу</p><div class="pool-cards" id="sort-pool"></div></div>';
+  html+='<div class="baskets-section" id="sort-baskets"></div>';
+  html+='<div id="sort-summary"></div>';
+  html+='<div style="margin-top:16px"><button class="btn btn-primary" id="sort-check-btn" disabled>Проверить</button></div>';
+  container.innerHTML=html;
+  stepState.pool=new Map();stepState.baskets={};stepState.selected=null;stepState.checked=false;
+  unit.subgroups.forEach(sg=>{stepState.baskets[sg.id]=[];});
+  const poolEl=document.getElementById('sort-pool');
+  wave.forEach(v=>{
+    const btn=document.createElement('button');
+    btn.className='pool-card';btn.dataset.id=v.id;
+    btn.innerHTML=`<div class="pc-v1" lang="en">${v.v1}</div><div class="pc-forms" lang="en">${v.v2} — ${v.v3}</div><div class="pc-ru">${v.ru}</div>`;
+    btn.addEventListener('click',()=>selectPoolCard(v.id));
+    poolEl.appendChild(btn);
+    stepState.pool.set(v.id,v);
+  });
+  const basketsEl=document.getElementById('sort-baskets');
+  unit.subgroups.forEach(sg=>{
+    const expected=wave.filter(v=>v.subgroup===sg.id).length;
+    const div=document.createElement('div');
+    div.className='basket';div.dataset.sg=sg.id;
+    div.innerHTML=`<div class="basket-header"><div class="basket-title">${sg.title}</div><div class="basket-hint">${sg.hint}</div><div class="basket-count">глаголов в группе: ${expected}</div></div><div class="basket-cards" data-sg="${sg.id}"></div>`;
+    div.addEventListener('click',(e)=>{
+      if(e.target.closest('.basket-chip')){returnChip(e.target.closest('.basket-chip').dataset.id,sg.id);return;}
+      if(stepState.selected&&!stepState.checked)placeInBasket(sg.id);
+    });
+    basketsEl.appendChild(div);
+  });
+  document.getElementById('sort-check-btn').addEventListener('click',()=>checkSort(wave,unit,isLast));
+  updateSortUI();
+}
+function selectPoolCard(id){
+  if(stepState.checked)return;
+  stepState.selected=stepState.selected===id?null:id;
+  updateSortUI();
+}
+function placeInBasket(sgId){
+  if(!stepState.selected||stepState.checked)return;
+  const id=stepState.selected;
+  stepState.baskets[sgId].push(id);
+  const btn=document.querySelector(`.pool-card[data-id="${id}"]`);
+  if(btn)btn.style.display='none';
+  stepState.selected=null;
+  const cardsEl=document.querySelector(`.basket-cards[data-sg="${sgId}"]`);
+  const chip=document.createElement('span');
+  chip.className='basket-chip';chip.dataset.id=id;chip.dataset.sg=sgId;
+  chip.textContent=stepState.pool.get(id).v1;chip.setAttribute('lang','en');
+  cardsEl.appendChild(chip);
+  updateSortUI();
+}
+function returnChip(id,sgId){
+  if(stepState.checked)return;
+  stepState.baskets[sgId]=stepState.baskets[sgId].filter(x=>x!==id);
+  const chip=document.querySelector(`.basket-chip[data-id="${id}"]`);
+  if(chip)chip.remove();
+  const btn=document.querySelector(`.pool-card[data-id="${id}"]`);
+  if(btn)btn.style.display='';
+  updateSortUI();
+}
+function updateSortUI(){
+  document.querySelectorAll('.pool-card').forEach(c=>{
+    c.classList.toggle('selected',c.dataset.id===stepState.selected);
+  });
+  let totalPlaced=0;
+  Object.values(stepState.baskets).forEach(arr=>totalPlaced+=arr.length);
+  const btn=document.getElementById('sort-check-btn');
+  if(btn&&!stepState.checked)btn.disabled=totalPlaced<stepState.pool.size;
+  const total=stepState.pool.size;
+  setProgress(total?totalPlaced/total*100:0);
+}
+function checkSort(wave,unit,isLast){
+  stepState.checked=true;
+  let correct=0;
+  Object.entries(stepState.baskets).forEach(([sgId,ids])=>{
+    ids.forEach(id=>{
+      const v=stepState.pool.get(id);
+      const chip=document.querySelector(`.basket-chip[data-id="${id}"][data-sg="${sgId}"]`);
+      if(v.subgroup===sgId){
+        if(chip)chip.classList.add('correct');correct++;
+      }else{
+        if(chip){chip.classList.add('incorrect');chip.innerHTML=v.v1+'<span class="chip-correction">Правильная подгруппа: '+unit.subgroups.find(s=>s.id===v.subgroup).title+'</span>';}
+        weakVerbs.add(id);
+      }
+    });
+  });
+  const total=wave.length;
+  const sumEl=document.getElementById('sort-summary');
+  if(correct===total)sumEl.innerHTML='<div class="sort-summary all-correct">Все на местах!</div>';
+  else sumEl.innerHTML='<div class="sort-summary has-errors">Правильно: '+correct+' из '+total+'</div>';
+  const btn=document.getElementById('sort-check-btn');
+  btn.textContent='Дальше →';btn.disabled=false;
+  btn.onclick=()=>{
+    if(!isLast){
+      stepState.waveIdx++;stepState.checked=false;
+      const c=document.getElementById('step-content');
+      c.innerHTML='<div class="wave-message">Хорошо! Следующая порция глаголов.</div>';
+      setTimeout(()=>renderSortWave(c,unit),800);
+    }else nextStep();
+  };
+  setProgress(100);
+}
+function renderStep2Simple(container,unit,verbs){
+  const unitId=currentUnit;
+  let baskets,pool,instruction;
+  if(unitId===1){
+    instruction='Отделите глаголы с тремя одинаковыми формами от остальных.';
+    const others=VERBS.filter(v=>v.group!==1);
+    const distractors=shuffle(others).slice(0,4);
+    pool=shuffle([...verbs,...distractors]);
+    baskets=[{id:'same',title:'Все три формы одинаковые'},{id:'diff',title:'Формы разные'}];
+    stepState.correctFn=(v,bId)=>(v.group===1&&bId==='same')||(v.group!==1&&bId==='diff');
+  }else{
+    instruction='Отделите глаголы, у которых 1-я и 3-я формы одинаковые, от остальных.';
+    const others=VERBS.filter(v=>v.group!==3&&v.group!==1);
+    const distractors=shuffle(others).slice(0,5);
+    pool=shuffle([...verbs,...distractors]);
+    baskets=[{id:'same13',title:'V1 и V3 одинаковые'},{id:'diff13',title:'V1 и V3 разные'}];
+    stepState.correctFn=(v,bId)=>(v.group===3&&bId==='same13')||(v.group!==3&&bId==='diff13');
+  }
+  stepState.pool=new Map();pool.forEach(v=>stepState.pool.set(v.id,v));
+  stepState.baskets={};baskets.forEach(b=>stepState.baskets[b.id]=[]);
+  stepState.selected=null;stepState.checked=false;stepState.simpleBasketsInfo=baskets;
+  let html='<h2 class="step-title">Шаг 2 из 6 · Сортировка</h2>';
+  html+='<p class="step-instruction">'+instruction+'</p>';
+  html+='<div class="pool-section"><p class="pool-hint">Нажмите на глагол, затем на нужную группу</p><div class="pool-cards" id="sort-pool"></div></div>';  html+='<div class="baskets-section" id="sort-baskets"></div>';
+  html+='<div id="sort-summary"></div>';
+  html+='<div style="margin-top:16px"><button class="btn btn-primary" id="sort-check-btn" disabled>Проверить</button></div>';
+  container.innerHTML=html;
+  const poolEl=document.getElementById('sort-pool');
+  pool.forEach(v=>{
+    const btn=document.createElement('button');
+    btn.className='pool-card';btn.dataset.id=v.id;
+    btn.innerHTML=`<div class="pc-v1" lang="en">${v.v1}</div><div class="pc-forms" lang="en">${v.v2} — ${v.v3}</div><div class="pc-ru">${v.ru}</div>`;
+    btn.addEventListener('click',()=>selectPoolCard(v.id));
+    poolEl.appendChild(btn);
+  });
+  const basketsEl=document.getElementById('sort-baskets');
+  baskets.forEach(b=>{
+    const div=document.createElement('div');
+    div.className='basket';div.dataset.sg=b.id;
+    div.innerHTML=`<div class="basket-header"><div class="basket-title">${b.title}</div></div><div class="basket-cards" data-sg="${b.id}"></div>`;
+    div.addEventListener('click',(e)=>{
+      if(e.target.closest('.basket-chip')){returnChip(e.target.closest('.basket-chip').dataset.id,b.id);return;}
+      if(stepState.selected&&!stepState.checked)placeInBasket(b.id);
+    });
+    basketsEl.appendChild(div);
+  });
+  document.getElementById('sort-check-btn').addEventListener('click',()=>checkSortSimple(pool));
+  updateSortUI();
+}
+function checkSortSimple(pool){
+  stepState.checked=true;
+  let correct=0;const total=pool.length;
+  Object.entries(stepState.baskets).forEach(([bId,ids])=>{
+    ids.forEach(id=>{
+      const v=stepState.pool.get(id);
+      const chip=document.querySelector(`.basket-chip[data-id="${id}"][data-sg="${bId}"]`);
+      if(stepState.correctFn(v,bId)){
+        if(chip)chip.classList.add('correct');correct++;
+      }else{
+        if(chip){
+          chip.classList.add('incorrect');
+          const correctBasket=stepState.simpleBasketsInfo.find(b=>b.id!==bId);
+          chip.innerHTML=v.v1+'<span class="chip-correction">Правильная подгруппа: '+correctBasket.title+'</span>';
+        }
+        if(getUnitVerbs(currentUnit).find(uv=>uv.id===id))weakVerbs.add(id);
+      }
+    });
+  });
+  const sumEl=document.getElementById('sort-summary');
+  if(correct===total)sumEl.innerHTML='<div class="sort-summary all-correct">Все на местах!</div>';
+  else sumEl.innerHTML='<div class="sort-summary has-errors">Правильно: '+correct+' из '+total+'</div>';
+  const btn=document.getElementById('sort-check-btn');
+  btn.textContent='Дальше →';btn.disabled=false;
+  btn.onclick=()=>nextStep();
+  setProgress(100);
+}
+// STEP 3 - Matching
+function renderStep3(container){
+  const verbs=getUnitVerbs(currentUnit);
+  const chunkSize=6;
+  const chunks=[];
+  for(let i=0;i<verbs.length;i+=chunkSize)chunks.push(verbs.slice(i,i+chunkSize));
+  stepState.chunks=chunks;stepState.chunkIdx=0;
+  renderMatchChunk(container);
+}
+function renderMatchChunk(container){
+  const chunk=stepState.chunks[stepState.chunkIdx];
+  const total=stepState.chunks.length;
+  const idx=stepState.chunkIdx;
+  stepState.matchSelected=null;stepState.matchPairs=new Map();stepState.matchChecked=false;
+  const leftCards=shuffle([...chunk]);
+  const rightCards=shuffle([...chunk]);
+  let html='<h2 class="step-title">Шаг 3 из 6 · Сопоставление</h2>';
+  html+='<p class="step-progress-label">Порция '+(idx+1)+' из '+total+'</p>';
+  html+='<p class="step-instruction">Соедините английский глагол с его русским переводом.</p>';
+  html+='<div class="match-columns"><div class="match-col" id="match-left">';
+  leftCards.forEach(v=>{
+    html+=`<button class="match-card" data-side="en" data-id="${v.id}"><span class="en" lang="en">${v.v1}</span></button>`;
+  });
+  html+='</div><div class="match-col" id="match-right">';
+  rightCards.forEach(v=>{
+    html+=`<button class="match-card" data-side="ru" data-id="${v.id}"><span class="ru">${v.ru}</span></button>`;
+  });
+  html+='</div></div>';
+  html+='<div id="match-summary"></div>';
+  html+='<div style="margin-top:16px"><button class="btn btn-primary" id="match-check-btn" disabled>Проверить</button></div>';
+  container.innerHTML=html;
+  const colors=['#E8D5C4','#D5E0CA','#D5DAE8','#E8DFC4','#D5E8E0','#E4D5E8'];
+  stepState.colorIdx=0;stepState.colors=colors;
+  container.querySelectorAll('.match-card').forEach(card=>{
+    card.addEventListener('click',()=>handleMatchTap(card,chunk));
+  });
+  document.getElementById('match-check-btn').addEventListener('click',()=>checkMatch(chunk));
+  setProgress(idx/total*100);
+}
+function handleMatchTap(card,chunk){
+  if(stepState.matchChecked)return;
+  const side=card.dataset.side;const id=card.dataset.id;
+  // If already paired, unpair
+  for(const [enId,ruId] of stepState.matchPairs){
+    if((side==='en'&&enId===id)||(side==='ru'&&ruId===id)){
+      stepState.matchPairs.delete(enId);
+      clearMatchColors();applyMatchColors();updateMatchCheckBtn(chunk);return;
+    }
+  }
+  if(!stepState.matchSelected){
+    stepState.matchSelected={side,id};
+    clearMatchColors();card.classList.add('selected');applyMatchColors();
+  }else{
+    if(stepState.matchSelected.side===side){
+      clearMatchColors();stepState.matchSelected={side,id};card.classList.add('selected');applyMatchColors();
+    }else{
+      const enId=side==='en'?id:stepState.matchSelected.id;
+      const ruId=side==='ru'?id:stepState.matchSelected.id;
+      // Remove any existing pairing for these ids
+      for(const [eId,rId] of stepState.matchPairs){
+        if(eId===enId||rId===ruId)stepState.matchPairs.delete(eId);
+      }
+      stepState.matchPairs.set(enId,ruId);
+      stepState.matchSelected=null;
+      clearMatchColors();applyMatchColors();updateMatchCheckBtn(chunk);
+    }
+  }
+}
+function clearMatchColors(){
+  document.querySelectorAll('.match-card').forEach(c=>{
+    c.classList.remove('selected','paired');c.style.backgroundColor='';
+  });
+}
+function applyMatchColors(){
+  let ci=0;
+  for(const [enId,ruId] of stepState.matchPairs){
+    const color=stepState.colors[ci%stepState.colors.length];ci++;
+    const enCard=document.querySelector(`.match-card[data-side="en"][data-id="${enId}"]`);
+    const ruCard=document.querySelector(`.match-card[data-side="ru"][data-id="${ruId}"]`);
+    if(enCard){enCard.classList.add('paired');enCard.style.backgroundColor=color;}
+    if(ruCard){ruCard.classList.add('paired');ruCard.style.backgroundColor=color;}
+  }
+}
+function updateMatchCheckBtn(chunk){
+  const btn=document.getElementById('match-check-btn');
+  if(btn&&!stepState.matchChecked)btn.disabled=stepState.matchPairs.size<chunk.length;
+}
+function checkMatch(chunk){
+  stepState.matchChecked=true;
+  let correct=0;
+  for(const [enId,ruId] of stepState.matchPairs){
+    const enCard=document.querySelector(`.match-card[data-side="en"][data-id="${enId}"]`);
+    const ruCard=document.querySelector(`.match-card[data-side="ru"][data-id="${ruId}"]`);
+    if(enId===ruId){
+      if(enCard)enCard.classList.add('correct');
+      if(ruCard)ruCard.classList.add('correct');
+      correct++;
+    }else{
+      if(enCard){enCard.classList.add('incorrect');const cv=chunk.find(v=>v.id===enId);enCard.innerHTML+=`<div class="match-correction">правильный перевод: ${cv.ru}</div>`;}
+      if(ruCard){ruCard.classList.add('incorrect');const cv=chunk.find(v=>v.id===ruId);ruCard.innerHTML+=`<div class="match-correction">правильный глагол: ${cv.v1}</div>`;}
+      weakVerbs.add(enId);weakVerbs.add(ruId);
+    }
+  }
+  const sumEl=document.getElementById('match-summary');
+  if(correct===chunk.length)sumEl.innerHTML='<div class="match-summary" style="background:var(--success-bg);color:var(--success)">Все верно!</div>';
+  else sumEl.innerHTML='<div class="match-summary" style="background:var(--error-bg);color:var(--error)">Правильно: '+correct+' из '+chunk.length+'</div>';
+  const btn=document.getElementById('match-check-btn');
+  btn.textContent='Дальше →';btn.disabled=false;
+  btn.onclick=()=>{
+    if(stepState.chunkIdx<stepState.chunks.length-1){
+      stepState.chunkIdx++;
+      renderMatchChunk(document.getElementById('step-content'));
+    }else nextStep();
+  };
+  setProgress((stepState.chunkIdx+1)/stepState.chunks.length*100);
+}
+
+// STEP 4 - Recognition
+function renderStep4(container){
+  const verbs=shuffle(getUnitVerbs(currentUnit));
+  stepState.recVerbs=verbs;stepState.recIdx=0;
+  renderRecCard(container);
+}
+function renderRecCard(container){
+  const verbs=stepState.recVerbs;
+  const idx=stepState.recIdx;
+  const v=verbs[idx];
+  const total=verbs.length;
+  const isRead=v.id==='read';
+  const showV2=Math.random()<0.5;
+  let displayForm,displayIpa,question;
+  if(isRead){
+    if(showV2){displayForm='/red/';displayIpa='(2-я или 3-я форма)';question='Какому глаголу принадлежит эта форма?';}
+    else{displayForm='/riːd/';displayIpa='(1-я форма)';question='Какому глаголу принадлежит эта форма?';}
+  }else{
+    displayForm=showV2?v.v2:v.v3;
+    displayIpa=showV2?v.ipa2:v.ipa3;
+    question='От какого глагола эта форма?';
+  }
+  const unitVerbs=getUnitVerbs(currentUnit);
+  let distractors=unitVerbs.filter(d=>d.id!==v.id);
+  if(distractors.length<3){
+    const others=VERBS.filter(d=>d.id!==v.id&&d.group!==currentUnit);
+    distractors=[...distractors,...shuffle(others)];
+  }
+  distractors=shuffle(distractors).slice(0,3);
+  const options=shuffle([v,...distractors]);
+  let html='<h2 class="step-title">Шаг 4 из 6 · Узнавание формы</h2>';
+  html+='<p class="step-progress-label">'+(idx+1)+' из '+total+'</p>';
+  html+='<div class="recognition-card"><div class="recognition-question">'+question+'</div>';
+  if(isRead){
+    html+='<div class="verb-form" style="margin-bottom:4px">'+displayForm+'</div>';
+    html+='<div class="recognition-special">'+displayIpa+'</div>';
+  }else{
+    html+='<div class="verb-form recognition-form" lang="en">'+displayForm+'</div>';
+    html+='<div class="ipa" lang="en" style="margin-bottom:16px">'+displayIpa+'</div>';
+  }
+  html+='<div class="recognition-options">';
+  options.forEach(o=>{
+    html+=`<button class="recognition-opt" data-id="${o.id}" lang="en">${o.v1}</button>`;
+  });
+  html+='</div></div>';
+  html+='<div id="rec-feedback" style="margin-top:16px"></div>';
+  html+='<div id="rec-next-wrap" style="margin-top:16px;display:none"><button class="btn btn-primary" id="rec-next-btn">Понятно, дальше →</button></div>';
+  container.innerHTML=html;
+  container.querySelectorAll('.recognition-opt').forEach(btn=>{
+    btn.addEventListener('click',()=>handleRecAnswer(btn,v));
+  });
+  setProgress(idx/total*100);
+}
+function handleRecAnswer(btn,verb){
+  if(stepState.recAnswered)return;
+  stepState.recAnswered=true;
+  const chosen=btn.dataset.id;
+  const isCorrect=chosen===verb.id;
+  if(isCorrect){
+    btn.classList.add('correct');
+    setTimeout(()=>{
+      stepState.recIdx++;stepState.recAnswered=false;
+      if(stepState.recIdx<stepState.recVerbs.length)renderRecCard(document.getElementById('step-content'));
+      else nextStep();
+    },800);
+    setProgress((stepState.recIdx+1)/stepState.recVerbs.length*100);
+  }else{
+    btn.classList.add('incorrect');
+    document.querySelector(`.recognition-opt[data-id="${verb.id}"]`).classList.add('correct');
+    weakVerbs.add(verb.id);
+    document.getElementById('rec-feedback').innerHTML='<div class="assembly-feedback is-incorrect">Запомните правильный ответ.</div>';
+    document.getElementById('rec-next-wrap').style.display='';
+    document.getElementById('rec-next-btn').addEventListener('click',()=>{
+      stepState.recIdx++;stepState.recAnswered=false;
+      if(stepState.recIdx<stepState.recVerbs.length)renderRecCard(document.getElementById('step-content'));
+      else nextStep();
+    });
+    setProgress((stepState.recIdx+1)/stepState.recVerbs.length*100);
+  }
+}
+// STEP 5 - Assembly
+function renderStep5(container){
+  const verbs=shuffle(getUnitVerbs(currentUnit));
+  stepState.asmVerbs=verbs;stepState.asmIdx=0;
+  renderAsmCard(container);
+}
+function renderAsmCard(container){
+  const verbs=stepState.asmVerbs;
+  const idx=stepState.asmIdx;
+  const v=verbs[idx];
+  const total=verbs.length;
+  const unitVerbs=getUnitVerbs(currentUnit);
+  let distractorForms=[];
+  unitVerbs.filter(d=>d.id!==v.id).forEach(d=>{distractorForms.push(d.v2);distractorForms.push(d.v3);});
+  const uniqueDistractors=[...new Set(distractorForms)].filter(f=>f!==v.v2&&f!==v.v3);
+  let pieces=[v.v2,v.v3];
+  if(v.id==='read'){pieces=[v.v2,v.v3];}
+  const numDistractors=Math.min(shuffle(uniqueDistractors).length,Math.max(4,8-pieces.length));
+  pieces=[...pieces,...shuffle(uniqueDistractors).slice(0,numDistractors)];
+  pieces=shuffle(pieces);
+  stepState.asmV2=null;stepState.asmV3=null;stepState.asmActive='v2';stepState.asmChecked=false;stepState.asmPieces=pieces;
+  let html='<h2 class="step-title">Шаг 5 из 6 · Сборка форм</h2>';
+  html+='<p class="step-progress-label">'+(idx+1)+' из '+total+'</p>';
+  html+='<p class="step-instruction">Укажите 2-ю и 3-ю формы глагола.</p>';
+  html+='<div class="assembly-card"><div class="assembly-given"><div class="verb-form" lang="en">'+v.v1+'</div><div class="ipa" lang="en">'+v.ipa1+'</div><div style="margin-top:4px">'+v.ru+'</div></div>';
+  html+='<div class="assembly-slots"><div class="assembly-slot active" id="slot-v2" data-slot="v2"><div class="slot-label">2-я форма (Past Simple)</div><div class="slot-value" id="slot-v2-val"></div><div class="slot-correction" id="slot-v2-corr"></div></div><div class="assembly-slot" id="slot-v3" data-slot="v3"><div class="slot-label">3-я форма (Past Participle)</div><div class="slot-value" id="slot-v3-val"></div><div class="slot-correction" id="slot-v3-corr"></div></div></div>';
+  html+='<div class="pieces-bank" id="pieces-bank">';
+  pieces.forEach((p,i)=>{
+    html+=`<button class="piece-btn" data-idx="${i}" data-form="${p}" lang="en">${p}</button>`;
+  });
+  html+='</div></div>';
+  html+='<div id="asm-feedback"></div>';
+  html+='<div style="margin-top:16px;display:none" id="asm-next-wrap"><button class="btn btn-primary" id="asm-next-btn">Понятно, дальше →</button></div>';
+  container.innerHTML=html;
+  document.querySelectorAll('.assembly-slot').forEach(slot=>{
+    slot.addEventListener('click',()=>{
+      if(stepState.asmChecked)return;
+      const s=slot.dataset.slot;
+      if(s==='v2'&&stepState.asmV2!==null){
+        const pi=stepState.asmV2;stepState.asmV2=null;
+        document.querySelector(`.piece-btn[data-idx="${pi}"]`).classList.remove('used');
+        document.getElementById('slot-v2-val').textContent='';
+      }else if(s==='v3'&&stepState.asmV3!==null){
+        const pi=stepState.asmV3;stepState.asmV3=null;
+        document.querySelector(`.piece-btn[data-idx="${pi}"]`).classList.remove('used');
+        document.getElementById('slot-v3-val').textContent='';
+      }
+      stepState.asmActive=s;
+      updateAsmSlots();
+    });
+  });
+  document.querySelectorAll('.piece-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(stepState.asmChecked||btn.classList.contains('used'))return;
+      const pi=parseInt(btn.dataset.idx);
+      const form=btn.dataset.form;
+      if(stepState.asmActive==='v2'){
+        if(stepState.asmV2!==null){
+          document.querySelector(`.piece-btn[data-idx="${stepState.asmV2}"]`).classList.remove('used');
+        }
+        stepState.asmV2=pi;
+        document.getElementById('slot-v2-val').textContent=form;
+        btn.classList.add('used');
+        if(stepState.asmV3===null)stepState.asmActive='v3';
+      }else{
+        if(stepState.asmV3!==null){
+          document.querySelector(`.piece-btn[data-idx="${stepState.asmV3}"]`).classList.remove('used');
+        }
+        stepState.asmV3=pi;
+        document.getElementById('slot-v3-val').textContent=form;
+        btn.classList.add('used');
+        if(stepState.asmV2===null)stepState.asmActive='v2';
+      }
+      updateAsmSlots();
+      if(stepState.asmV2!==null&&stepState.asmV3!==null)checkAsm(v);
+    });
+  });
+  setProgress(idx/total*100);
+}
+function updateAsmSlots(){
+  document.querySelectorAll('.assembly-slot').forEach(s=>{
+    s.classList.toggle('active',s.dataset.slot===stepState.asmActive);
+    s.classList.toggle('filled',(s.dataset.slot==='v2'&&stepState.asmV2!==null)||(s.dataset.slot==='v3'&&stepState.asmV3!==null));
+  });
+}
+function checkAsm(v){
+  stepState.asmChecked=true;
+  const v2Form=document.getElementById('slot-v2-val').textContent;
+  const v3Form=document.getElementById('slot-v3-val').textContent;
+  const v2ok=v2Form===v.v2;
+  const v3ok=v3Form===v.v3;
+  const slotV2=document.getElementById('slot-v2');
+  const slotV3=document.getElementById('slot-v3');
+  slotV2.classList.remove('active');slotV3.classList.remove('active');
+  slotV2.classList.add(v2ok?'correct':'incorrect');
+  slotV3.classList.add(v3ok?'correct':'incorrect');
+  if(!v2ok)document.getElementById('slot-v2-corr').textContent='Правильно: '+v.v2+' '+v.ipa2;
+  if(!v3ok)document.getElementById('slot-v3-corr').textContent='Правильно: '+v.v3+' '+v.ipa3;
+  const fb=document.getElementById('asm-feedback');
+  const allOk=v2ok&&v3ok;
+  const advance=()=>{
+    stepState.asmIdx++;
+    if(stepState.asmIdx<stepState.asmVerbs.length)renderAsmCard(document.getElementById('step-content'));
+    else nextStep();
+  };
+  if(allOk){
+    fb.innerHTML='<div class="assembly-feedback is-correct">Правильно!</div><div style="text-align:center;margin-top:8px"><span class="ipa" lang="en">'+v.ipa2+' — '+v.ipa3+'</span></div>';
+    setTimeout(advance,800);
+  }else{
+    fb.innerHTML='<div class="assembly-feedback is-incorrect">Запомните правильный ответ.</div>';
+    weakVerbs.add(v.id);
+    document.getElementById('asm-next-wrap').style.display='';
+    document.getElementById('asm-next-btn').addEventListener('click',advance);
+  }
+  setProgress((stepState.asmIdx+1)/stepState.asmVerbs.length*100);
+}
+
+// STEP 6 - Final test
+function renderStep6(container){
+  const verbs=shuffle(getUnitVerbs(currentUnit));
+  stepState.fcVerbs=verbs;stepState.fcIdx=0;
+  stepState.fcResults={easy:0,hard:0,fail:0};stepState.fcEasyIds=[];
+  renderFlashcard(container,false);
+}
+function renderFlashcard(container,isMiniReview){
+  const verbs=isMiniReview?stepState.mrVerbs:stepState.fcVerbs;
+  const idx=isMiniReview?stepState.mrIdx:stepState.fcIdx;
+  const v=verbs[idx];
+  const total=verbs.length;
+  const isFirst=idx===0;
+  let html='';
+  if(isMiniReview){
+    html+='<h2 class="step-title">Добор: глаголы, в которых были ошибки</h2>';
+    html+='<p class="step-progress-label">'+total+' шт. — пройдём их ещё раз</p>';
+  }else{
+    html+='<h2 class="step-title">Шаг 6 из 6 · Итоговая проверка</h2>';
+  }
+  html+='<p class="step-progress-label">'+(idx+1)+' из '+total+'</p>';
+  if(isFirst&&!isMiniReview)html+='<p class="step-instruction">Прочитайте перевод. Громко и чётко произнесите все три формы глагола, вспомните, как они пишутся. Затем нажмите «Показать ответ» и честно оцените, насколько хорошо вы их запомнили.</p>';
+  else html+='<p class="step-instruction">Произнесите все три формы.</p>';
+  html+='<div class="flashcard"><div class="flashcard-ru">'+v.ru+'</div>';
+  html+='<div id="fc-answer" style="display:none"></div>';
+  html+='<button class="btn btn-primary" id="fc-show-btn">Показать ответ</button>';
+  html+='<div id="fc-assess" style="display:none"></div>';
+  html+='</div>';
+  container.innerHTML=html;
+  document.getElementById('fc-show-btn').addEventListener('click',()=>{
+    document.getElementById('fc-show-btn').style.display='none';
+    const ansEl=document.getElementById('fc-answer');
+    ansEl.style.display='';
+    let ansHtml='<div class="flashcard-answer"><span class="verb-form" lang="en">'+v.v1+' — '+v.v2+' — '+v.v3+'</span><span class="ipa" lang="en">'+v.ipa1+' — '+v.ipa2+' — '+v.ipa3+'</span>';
+    if(v.id==='read')ansHtml+='<div class="read-note" style="margin-top:8px">V2 и V3 произносятся /red/</div>';
+    ansHtml+='</div>';
+    ansEl.innerHTML=ansHtml;
+    const assessEl=document.getElementById('fc-assess');
+    assessEl.style.display='';
+    assessEl.innerHTML='<div class="self-assess-btns"><button class="assess-btn assess-easy" data-val="easy">Вспомнил легко</button><button class="assess-btn assess-hard" data-val="hard">Вспомнил с трудом</button><button class="assess-btn assess-fail" data-val="fail">Не вспомнил</button></div>';
+    assessEl.querySelectorAll('.assess-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>handleAssess(btn.dataset.val,v,isMiniReview));
+    });
+  });
+  if(!isMiniReview)setProgress(idx/total*100);
+}
+function handleAssess(val,verb,isMiniReview){
+  if(isMiniReview){
+    stepState.mrIdx++;
+    if(stepState.mrIdx<stepState.mrVerbs.length)renderFlashcard(document.getElementById('step-content'),true);
+    else showResult();
+    return;
+  }
+  if(val==='easy'){stepState.fcResults.easy++;stepState.fcEasyIds.push(verb.id);}
+  else if(val==='hard')stepState.fcResults.hard++;
+  else stepState.fcResults.fail++;
+  stepState.fcIdx++;
+  if(stepState.fcIdx<stepState.fcVerbs.length){
+    renderFlashcard(document.getElementById('step-content'),false);
+  }else{
+    finishUnit();
+  }
+}
+
+// Finish unit - mini review then result
+function finishUnit(){
+  const weakArr=[...weakVerbs].map(id=>VERBS.find(v=>v.id===id)).filter(Boolean);
+  if(weakArr.length>0){
+    stepState.mrVerbs=shuffle(weakArr);stepState.mrIdx=0;stepState.miniReviewDone=true;
+    renderFlashcard(document.getElementById('step-content'),true);
+  }else{
+    stepState.miniReviewDone=false;
+    showResult();
+  }
+}
+
+function showResult(){
+  const u=getUnit(currentUnit);
+  const verbs=getUnitVerbs(currentUnit);
+  const r=stepState.fcResults;
+  const total=verbs.length;
+  const easyPct=r.easy/total;
+  const failPct=r.fail/total;
+  let stars=1;
+  if(easyPct>=0.9)stars=3;
+  else if(easyPct>=0.6&&failPct<=0.1)stars=2;
+  if(!state.units[currentUnit])state.units[currentUnit]={};
+  const ud=state.units[currentUnit];
+  ud.completed=true;
+  ud.stars=Math.max(ud.stars||0,stars);
+  ud.completedAt=new Date().toISOString();
+  ud.easyVerbs=stepState.fcEasyIds;
+  ud.lastResult={
+    completedAt:ud.completedAt,
+    selfAssessment:{easy:r.easy,hard:r.hard,fail:r.fail},
+    objectiveErrors:weakVerbs.size,
+    weakVerbIds:[...weakVerbs],
+    miniReviewDone:stepState.miniReviewDone||false
+  };
+  saveState();
+  renderResultScreen(currentUnit,ud.stars,r,weakVerbs.size,[...weakVerbs],stepState.miniReviewDone||false,true);
+}
+function showSavedResult(unitId){
+  currentUnit=unitId;
+  const ud=state.units[unitId];
+  const lr=ud.lastResult;
+  renderResultScreen(unitId,ud.stars,lr.selfAssessment,lr.objectiveErrors,lr.weakVerbIds,lr.miniReviewDone,false);
+}
+function renderResultScreen(unitId,stars,selfAssess,objErrors,weakList,miniReviewDone,showConfetti){
+  const u=getUnit(unitId);
+  const verbs=getUnitVerbs(unitId);
+  const total=verbs.length;
+  showScreen('result-screen');
+  const ud=state.units[unitId];
+  const completedAt=ud&&ud.completedAt?new Date(ud.completedAt):new Date();
+  const dateStr=new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}).format(completedAt);
+  const timeStr=new Intl.DateTimeFormat('ru-RU',{hour:'2-digit',minute:'2-digit',hour12:false}).format(completedAt);
+  let starDesc='';
+  if(stars===3)starDesc='Отлично! Глаголы юнита освоены.';
+  else if(stars===2)starDesc='Хороший результат. Слабые глаголы стоит повторить.';
+  else starDesc='Юнит пройден. Рекомендуется пройти ещё раз.';
+  let weakStr='';
+  if(weakList.length>0){
+    if(weakList.length>10)weakStr=weakList.slice(0,10).join(', ')+' … и ещё '+(weakList.length-10);
+    else weakStr=weakList.join(', ');
+  }
+  let html='<h1 style="text-align:center">Юнит '+unitId+' завершён!</h1>';
+  html+='<h2 style="text-align:center;margin-top:4px;color:var(--text-secondary)">'+u.title+'</h2>';
+  html+='<div class="result-stars">'+starsHTML(stars,48)+'</div>';
+  html+='<p class="result-desc">'+starDesc+'</p>';
+  html+='<div class="card report-card">';
+  html+=reportRow('Студент',state.name);
+  html+=reportRow('Юнит',unitId+'. '+u.title);
+  html+=reportRow('Дата',dateStr);
+  html+=reportRow('Время',timeStr);
+  html+=reportRow('Глаголов в юните',''+total);
+  html+=reportRow('Самооценка','Легко: '+selfAssess.easy+', С трудом: '+selfAssess.hard+', Не вспомнил: '+selfAssess.fail);
+  html+=reportRow('Ошибки в шагах 2–5',objErrors>0?objErrors+' глаголов':'Без ошибок');
+  if(weakStr)html+=reportRow('Слабые глаголы',weakStr);
+  html+=reportRow('Мини-добор',miniReviewDone?'пройден':'не требовался');
+  html+='</div>';
+  html+='<div class="result-btns"><button class="btn btn-secondary" id="result-retry">Пройти юнит ещё раз</button><button class="btn btn-primary" id="result-home">На главную</button></div>';
+  document.getElementById('result-content').innerHTML=html;
+  document.getElementById('result-retry').addEventListener('click',()=>beginUnit(unitId));
+  document.getElementById('result-home').addEventListener('click',renderMenu);
+  if(showConfetti&&stars===3)launchConfetti();
+}
+function reportRow(label,value){
+  return '<div class="report-row"><span class="report-label">'+label+'</span><span class="report-value">'+value+'</span></div>';
+}
+function launchConfetti(){
+  const colors=['#B8612A','#D4A636','#5C7A3E','#1E2A44','#A8412D'];
+  const cont=document.createElement('div');
+  cont.className='confetti-container';
+  for(let i=0;i<25;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.left=Math.random()*100+'%';
+    p.style.background=colors[i%colors.length];
+    p.style.animationDelay=Math.random()*500+'ms';
+    p.style.animationDuration=(1200+Math.random()*600)+'ms';
+    cont.appendChild(p);
+  }
+  document.body.appendChild(cont);
+  setTimeout(()=>cont.remove(),2500);
+}
+
+// Settings & modals
+document.getElementById('open-settings').addEventListener('click',()=>{
+  document.getElementById('settings-modal').classList.add('is-active');
+  document.getElementById('settings-name').value=state.name;
+});
+document.getElementById('close-settings').addEventListener('click',()=>{
+  document.getElementById('settings-modal').classList.remove('is-active');
+});
+document.getElementById('save-name-btn').addEventListener('click',()=>{
+  const v=document.getElementById('settings-name').value.trim().slice(0,30);
+  if(v){state.name=v;saveState();document.getElementById('greeting').textContent='Привет, '+v+'!';}
+});
+document.getElementById('dark-toggle').addEventListener('click',()=>{
+  state.settings.darkMode=!state.settings.darkMode;
+  saveState();applyTheme();
+});
+let pendingReset=null;
+document.getElementById('reset-unit-btn').addEventListener('click',()=>{
+  const uid=document.getElementById('reset-unit-select').value;
+  pendingReset={type:'unit',uid:parseInt(uid)};
+  document.getElementById('confirm-modal').classList.add('is-active');
+});
+document.getElementById('reset-all-btn').addEventListener('click',()=>{
+  pendingReset={type:'all'};
+  document.getElementById('confirm-modal').classList.add('is-active');
+});
+document.getElementById('confirm-yes').addEventListener('click',()=>{
+  if(pendingReset){
+    if(pendingReset.type==='unit'){delete state.units[pendingReset.uid];saveState();}
+    else{try{localStorage.removeItem(LS_KEY);}catch(e){}state=null;}
+  }
+  pendingReset=null;
+  document.getElementById('confirm-modal').classList.remove('is-active');
+  document.getElementById('settings-modal').classList.remove('is-active');
+  if(state)renderMenu();else renderWelcome();
+});
+document.getElementById('confirm-no').addEventListener('click',()=>{
+  pendingReset=null;
+  document.getElementById('confirm-modal').classList.remove('is-active');
+});
+document.getElementById('unit-back').addEventListener('click',renderMenu);
+
+// Welcome handlers
+const nameInput=document.getElementById('name-input');
+const startBtn=document.getElementById('start-btn');
+nameInput.addEventListener('input',()=>{startBtn.disabled=!nameInput.value.trim();});
+nameInput.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!startBtn.disabled)startBtn.click();});
+startBtn.addEventListener('click',()=>{
+  const name=nameInput.value.trim().slice(0,30);
+  if(!name)return;
+  initState(name);applyTheme();renderMenu();
+});
+
+// Init
+lsAvailable=checkLS();
+loadState();
+if(state&&state.name){applyTheme();renderMenu();}
+else renderWelcome();
+</script>
+</body>
+</html>
