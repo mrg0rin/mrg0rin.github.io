@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prepositions of Time — Homework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1e293b; --muted:#64748b;
+    --indigo:#6366f1; --indigo-d:#4f46e5;
+    --at:#d97706; --at-bg:#fffbeb; --at-b:#fcd34d;
+    --on:#059669; --on-bg:#ecfdf5; --on-b:#6ee7b7;
+    --in:#0284c7; --in-bg:#f0f9ff; --in-b:#7dd3fc;
+    --no:#7c3aed; --no-bg:#f5f3ff; --no-b:#c4b5fd;
+    --ok:#059669; --ok-bg:#ecfdf5; --ok-b:#34d399;
+    --bad:#dc2626; --bad-bg:#fef2f2; --bad-b:#f87171;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; color:var(--ink); line-height:1.55;
+    font-family:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    background:#eef1fb; min-height:100vh; overflow-x:hidden;
+  }
+  button,select{touch-action:manipulation}
+  .hidden{display:none!important}
+
+  /* decorative background */
+  .blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.5;z-index:-1;pointer-events:none}
+  .blob.b1{width:420px;height:420px;background:#c7d2fe;top:-140px;left:-120px}
+  .blob.b2{width:380px;height:380px;background:#fbcfe8;bottom:-120px;right:-100px}
+  .blob.b3{width:300px;height:300px;background:#bbf7d0;top:40%;left:-160px}
+
+  .wrap{max-width:880px;margin:0 auto;padding:14px 14px 40px}
+  @media(min-width:720px){.wrap{padding:24px 20px 56px}}
+
+  /* hero */
+  .hero{
+    position:relative;overflow:hidden;border-radius:24px;padding:26px 22px;color:#fff;
+    background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 55%,#db2777 120%);
+    box-shadow:0 14px 34px rgba(79,70,229,.35);
+  }
+  .hero h1{margin:0 0 6px;font-size:clamp(24px,5.5vw,34px);font-weight:900;letter-spacing:-.01em}
+  .hero p{margin:0;font-size:15px;opacity:.92;font-weight:600}
+  .hero .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .hero .pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:800;letter-spacing:.03em}
+  .clock{position:absolute;right:14px;top:12px;font-size:52px;opacity:.28;transform:rotate(12deg)}
+
+  /* sticky progress */
+  .progress-sticky{
+    position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;
+    margin:14px 0;padding:8px 12px;border-radius:999px;
+    background:rgba(238,241,251,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid #dfe4f5;
+  }
+  .pline{flex:1;height:10px;border-radius:99px;background:#dde3f4;overflow:hidden}
+  .pline i{display:block;height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,#6366f1,#a855f7,#ec4899);transition:width .45s cubic-bezier(.2,.7,.3,1)}
+  .dots{display:flex;gap:6px}
+  .dot{width:12px;height:12px;border-radius:50%;background:#c9d2ee;border:2px solid #c9d2ee;transition:all .25s}
+  .dot.cur{background:#fff;border-color:var(--indigo);transform:scale(1.2);box-shadow:0 0 0 3px rgba(99,102,241,.2)}
+  .dot.done{background:var(--ok);border-color:var(--ok)}
+  .dot.done::after{content:''}
+
+  /* card */
+  .card{
+    position:relative;overflow:hidden;background:#fff;border:1px solid #e3e8f5;border-radius:24px;
+    padding:18px 16px 20px;box-shadow:0 10px 30px rgba(15,23,42,.07);
+    animation:pop .35s cubic-bezier(.2,.8,.3,1) both;
+  }
+  @media(min-width:720px){.card{padding:28px 28px 30px}}
+  @keyframes pop{from{opacity:0;transform:translateY(12px) scale(.985)}}
+
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .badge{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+  .b-num{background:var(--indigo);color:#fff}
+  .b-type{background:#eef2ff;color:var(--indigo-d);border:1px solid #dbe2ff}
+  .b-part{background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8}
+
+  .instruction{margin:2px 0 14px;font-size:17.5px;font-weight:800;line-height:1.4}
+  @media(min-width:720px){.instruction{font-size:19px}}
+
+  b.tl{font-weight:900;background:linear-gradient(transparent 62%, rgba(250,204,21,.55) 62%);border-radius:3px;padding:0 1px}
+
+  .reading{
+    background:linear-gradient(180deg,#eef2ff,#f6f8ff);border:1.5px solid #dbe2ff;border-radius:16px;
+    padding:14px 16px;font-size:16px;line-height:1.75;
+  }
+  @media(min-width:720px){.reading{font-size:17px;padding:16px 20px}}
+
+  /* pool + chips */
+  .pool-title{margin:16px 0 8px;font-weight:900;font-size:14px;letter-spacing:.02em}
+  .pool-title .muted{font-weight:600;color:var(--muted);font-size:12.5px;letter-spacing:0}
+  .pool{
+    display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;
+    min-height:76px;padding:12px;border-radius:16px;
+    border:2px dashed #c9d2ee;background:#f8fafc;transition:border-color .15s,background .15s;
+  }
+  .pool.dragover{border-color:var(--indigo);background:#eef2ff}
+  .pool.pulse{animation:pulse 1s ease 2}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,0)}50%{box-shadow:0 0 0 6px rgba(99,102,241,.25)}}
+
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 14px;border-radius:999px;border:2px solid #dfe4f5;background:#fff;
+    font:inherit;font-size:15px;font-weight:800;color:#334155;
+    cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+    touch-action:none;box-shadow:0 2px 6px rgba(15,23,42,.08);
+    transition:transform .15s,box-shadow .15s,border-color .15s,background .15s,color .15s;
+    animation:chipIn .3s cubic-bezier(.2,.8,.3,1) both;
+  }
+  @keyframes chipIn{from{opacity:0;transform:scale(.8)}}
+  .chip:nth-child(2){animation-delay:.04s}.chip:nth-child(3){animation-delay:.08s}.chip:nth-child(4){animation-delay:.12s}
+  .chip:hover:not(:disabled){transform:translateY(-2px);border-color:#b9c3f2}
+  .chip.selected{border-color:var(--indigo);box-shadow:0 0 0 4px rgba(99,102,241,.28);transform:translateY(-2px)}
+  .chip.dragging{
+    position:fixed;z-index:999;pointer-events:none;cursor:grabbing;margin:0;
+    transform:scale(1.07) rotate(2deg);box-shadow:0 16px 34px rgba(15,23,42,.28);
+    animation:none;
+  }
+  .chip.locked,.chip:disabled{background:#f1f5f9;border:2px dashed #cbd5e1;color:#64748b;cursor:default;box-shadow:none}
+  .chip.wrong{background:var(--bad-bg);border-color:var(--bad-b);color:#991b1b;animation:shake .4s}
+  .chip.correct{background:var(--ok-bg)!important;border:2px solid var(--ok-b)!important;color:#065f46!important;box-shadow:none}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+  /* sorting table */
+  .grid{display:grid;gap:10px;grid-template-columns:repeat(2,1fr);margin-top:14px}
+  @media(min-width:720px){.grid{grid-template-columns:repeat(4,1fr);gap:12px}}
+  .zone{display:flex;flex-direction:column;border-radius:16px;overflow:hidden;border:2px solid;background:#fff}
+  .zone-head{
+    padding:8px 6px;text-align:center;font-weight:900;letter-spacing:.06em;color:#fff;font-size:12.5px;
+  }
+  @media(min-width:720px){.zone-head{font-size:13.5px}}
+  .zone.col-at{border-color:var(--at-b)}.zone.col-at .zone-head{background:var(--at)}
+  .zone.col-on{border-color:var(--on-b)}.zone.col-on .zone-head{background:var(--on)}
+  .zone.col-in{border-color:var(--in-b)}.zone.col-in .zone-head{background:var(--in)}
+  .zone.col-none{border-color:var(--no-b)}.zone.col-none .zone-head{background:var(--no)}
+  .zone-body{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;
+    min-height:132px;padding:10px 8px;user-select:none;-webkit-user-select:none;
+    transition:background .15s;
+  }
+  .zone.col-at .zone-body{background:var(--at-bg)}
+  .zone.col-on .zone-body{background:var(--on-bg)}
+  .zone.col-in .zone-body{background:var(--in-bg)}
+  .zone.col-none .zone-body{background:var(--no-bg)}
+  .zone.dragover .zone-body{outline:3px dashed rgba(99,102,241,.55);outline-offset:-6px;background:#eef2ff}
+  .zone-body:focus-visible{outline:3px solid var(--indigo);outline-offset:-3px}
+
+  /* dropdown sentences */
+  .sentences{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .sentence{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:11px 13px;border-radius:14px;background:#f8fafc;border:1.5px solid #e6eaf4;
+    font-size:16px;line-height:1.9;
+  }
+  .letter{
+    flex:none;width:27px;height:27px;margin-top:5px;border-radius:50%;
+    background:#eef2ff;color:var(--indigo-d);font-weight:900;font-size:13.5px;
+    display:grid;place-items:center;
+  }
+  select.gap{
+    appearance:none;-webkit-appearance:none;
+    font:inherit;font-size:15px;font-weight:900;color:var(--indigo-d);
+    border:2px solid #c7d2fe;border-radius:11px;background:#fff;
+    background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%234f46e5' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 10px center;
+    min-width:88px;max-width:110px;padding:5px 32px 5px 12px;margin:0 2px;cursor:pointer;
+    vertical-align:middle;transition:border-color .15s,background-color .15s;
+  }
+  select.gap.pulse{animation:pulse 1s ease 2}
+  select.gap.wrong{border-color:var(--bad-b);background-color:var(--bad-bg);color:#b91c1c;animation:shake .4s}
+  select.gap.correct{border-color:var(--ok-b)!important;background-color:var(--ok-bg)!important;color:#065f46!important;cursor:default}
+  select.gap:disabled{opacity:1}
+
+  /* feedback + actions */
+  .feedback{display:none;margin-top:16px;padding:12px 16px;border-radius:14px;font-size:15.5px;font-weight:700}
+  .feedback.show{display:block;animation:pop .3s both}
+  .feedback.good{background:var(--ok-bg);color:#065f46;border:1.5px solid var(--ok-b)}
+  .feedback.partial{background:#fffbeb;color:#92400e;border:1.5px solid var(--at-b)}
+  .feedback.info{background:#eef2ff;color:#3730a3;border:1.5px solid #c7d2fe}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .btn{
+    border:none;font:inherit;font-weight:900;font-size:15.5px;border-radius:999px;
+    padding:12px 26px;min-height:50px;cursor:pointer;
+    transition:transform .12s,box-shadow .12s,opacity .15s;
+  }
+  .btn:active:not(:disabled){transform:scale(.96)}
+  .btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 8px 18px rgba(99,102,241,.35)}
+  .btn-primary:hover:not(:disabled){box-shadow:0 10px 22px rgba(99,102,241,.45)}
+  .btn-ghost{background:#fff;color:#475569;border:2px solid #e2e8f0}
+  .btn-ghost:hover:not(:disabled){border-color:#cbd5e1}
+  .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+  .navrow{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
+  .navrow .btn{flex:0 1 auto}
+  @media(max-width:480px){.navrow{flex-direction:column-reverse}.navrow .btn{width:100%}}
+
+  /* results */
+  .score-ring{
+    width:150px;height:150px;border-radius:50%;margin:6px auto 14px;display:grid;place-items:center;
+    background:conic-gradient(var(--rc,#059669) calc(var(--p,0)*1%), #e2e8f0 0);
+  }
+  .score-ring>div{width:118px;height:118px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:inset 0 2px 8px rgba(15,23,42,.06)}
+  .score-ring b{font-size:34px;font-weight:900;display:block;line-height:1}
+  .score-ring span{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.06em}
+  .rrows{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+  .rrow{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:#f8fafc;border:1.5px solid #e6eaf4;font-weight:700;font-size:15px}
+  .rrow .rn{flex:none;width:24px;height:24px;border-radius:50%;background:#eef2ff;color:var(--indigo-d);font-weight:900;font-size:12.5px;display:grid;place-items:center}
+  .rrow .rt{flex:1}
+  .rrow .rs{font-weight:900}
+  .rs.all{color:var(--ok)}.rs.some{color:var(--at)}.rs.low{color:var(--bad)}
+  .center{text-align:center}
+  .bigmsg{font-size:22px;font-weight:900;margin:4px 0 2px}
+
+  .confetti{position:absolute;top:-24px;font-size:20px;pointer-events:none;z-index:5;will-change:transform}
+
+  .toast{
+    position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1200;
+    background:#1e293b;color:#fff;font-weight:700;font-size:14.5px;
+    padding:11px 20px;border-radius:999px;box-shadow:0 10px 26px rgba(15,23,42,.35);
+    max-width:min(92vw,480px);text-align:center;animation:toastIn .3s cubic-bezier(.2,.8,.3,1);
+  }
+  @keyframes toastIn{from{opacity:0;transform:translate(-50%,14px)}}
+
+  footer{margin-top:26px;text-align:center;color:#8b95b2;font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="clock">⏰</div>
+    <h1>Prepositions of Time</h1>
+    <p>at · on · in — or nothing at all!</p>
+    <div class="pills">
+      <span class="pill">5 exercises</span>
+      <span class="pill">Drag &amp; drop</span>
+      <span class="pill">Fill the gaps</span>
+    </div>
+  </header>
+
+  <div class="progress-sticky">
+    <div class="pline"><i id="fill"></i></div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <main>
+    <section id="card" aria-live="polite"></section>
+    <div class="navrow" id="nav"></div>
+  </main>
+
+  <footer>Adapted from ESL Brains · “What’s in your calendar?”</footer>
+</div>
+
+<noscript><p style="text-align:center;font-weight:700">Please enable JavaScript to do the exercises.</p></noscript>
+
+<script>
+'use strict';
+
+/* ---------- data (from prepHW.pdf) ---------- */
+const COLS = [
+  { id:'at',  label:'AT' },
+  { id:'on',  label:'ON' },
+  { id:'in',  label:'IN' },
+  { id:'none',label:'NO PREPOSITION' }
+];
+
+const RAW = [
+  {
+    type:'dnd', part:'Part 1 of 3',
+    instruction:'Read the texts and put the phrases with prepositions of time into the correct columns in the table.',
+    text:'My birthday is on <b class="tl">the 25th of October</b>. We usually go to a restaurant on <b class="tl">my birthday</b>. <b class="tl">This year</b>, we have decided to have a party at home in <b class="tl">the evening</b> and go to a karaoke bar at <b class="tl">night</b>.',
+    locked:{ at:['night'], on:['Friday'], in:['2020'], none:['this week'] },
+    pool:[
+      { t:'the 25th of October', c:'on' },
+      { t:'my birthday',         c:'on' },
+      { t:'the evening',         c:'in' },
+      { t:'this year',           c:'none' }
+    ]
+  },
+  {
+    type:'dnd', part:'Part 2 of 3',
+    instruction:'Read the texts and put the phrases with prepositions of time into the correct columns in the table.',
+    text:'We usually go on holiday in <b class="tl">the summer</b>. In <b class="tl">2020</b>, we went to the sea. In <b class="tl">June</b> <b class="tl">last year</b>, we went to the mountains. <b class="tl">Next month</b>, we are going to buy tickets to Tokyo.',
+    locked:{ at:['night'], on:['Friday','the 25th of October','my birthday'], in:['2020','the evening'], none:['this week','this year'] },
+    pool:[
+      { t:'the summer',  c:'in' },
+      { t:'June',        c:'in' },
+      { t:'last year',   c:'none' },
+      { t:'next month',  c:'none' }
+    ]
+  },
+  {
+    type:'dnd', part:'Part 3 of 3',
+    instruction:'Read the texts and put the phrases with prepositions of time into the correct columns in the table.',
+    text:'I have a lot of meetings on <b class="tl">Friday</b>. I usually have a call at <b class="tl">9 a.m.</b> with my team. In <b class="tl">the afternoon</b>, I meet my boss to discuss our results. I meet up with friends on <b class="tl">Friday evening</b>. I have a good rest at <b class="tl">the weekend</b>. <b class="tl">This week</b>, I’m having a day off on Friday.',
+    locked:{ at:['night'], on:['Friday','the 25th of October','my birthday'], in:['2020','the evening','the summer','June'], none:['this week','this year','last year','next month'] },
+    pool:[
+      { t:'9 a.m.',        c:'at' },
+      { t:'the weekend',   c:'at' },
+      { t:'the afternoon', c:'in' },
+      { t:'Friday evening',c:'on' }
+    ]
+  },
+  {
+    type:'gap', part:'Part 1 of 2',
+    instruction:'Read the sentences and complete the gaps with the correct preposition or leave them blank if no preposition is needed.',
+    items:[
+      { letter:'A', before:"Let's meet",                         after:'<b class="tl">next week</b>.',        a:''  },
+      { letter:'B', before:'The meeting starts',                 after:'<b class="tl">3 p.m.</b> Don’t be late!', a:'at'},
+      { letter:'C', before:'I have an appointment with our mentor', after:'<b class="tl">the 12th of July</b>.', a:'on'},
+      { letter:'D', before:'What are you planning to do',        after:'<b class="tl">the weekend</b>?',      a:'at'},
+      { letter:'E', before:'We are working on a really important issue', after:'<b class="tl">this month</b>.', a:''  },
+      { letter:'F', before:'I have an English lesson',           after:'<b class="tl">Monday</b>.',           a:'on'},
+      { letter:'G', before:'I started working here',             after:'<b class="tl">2012</b>.',             a:'in'},
+      { letter:'H', before:'We will celebrate it',               after:'<b class="tl">March</b>.',            a:'in'}
+    ]
+  },
+  {
+    type:'gap', part:'Part 2 of 2',
+    instruction:'Read the sentences and complete the gaps with the correct preposition or leave them blank if no preposition is needed.',
+    items:[
+      { letter:'I', before:'We will go to a restaurant',         after:'<b class="tl">Valentine’s Day</b>.',  a:'on'},
+      { letter:'J', before:'He usually has a holiday',           after:'<b class="tl">spring</b>.',           a:'in'},
+      { letter:'K', before:'I’m more productive',                after:'<b class="tl">the evening</b>.',      a:'in'},
+      { letter:'L', before:'I don’t sleep well',                 after:'<b class="tl">night</b>.',            a:'at'},
+      { letter:'M', before:'We had good results',                after:'<b class="tl">last year</b>.',        a:''  },
+      { letter:'N', before:'They will arrive',                   after:'<b class="tl">Thursday evening</b>.', a:'on'}
+    ]
+  }
+];
+
+/* ---------- state ---------- */
+const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+RAW.forEach(ex=>{
+  if(ex.type==='dnd'){ ex.pool.forEach((p,i)=>p.id='p'+i); shuffle(ex.pool); }
+  else ex.items.forEach((s,i)=>s.id='s'+i);
+});
+
+const XS = RAW.map(ex=>({
+  checkedOnce:false, revealed:false, done:false, first:null,
+  okIds:new Set(),
+  placed: ex.type==='dnd' ? Object.fromEntries(ex.pool.map(p=>[p.id,'pool'])) : null,
+  vals:   ex.type==='gap' ? Object.fromEntries(ex.items.map(s=>[s.id,'?']))   : null
+}));
+
+const S = { cur:0, finished:false };
+const el = id => document.getElementById(id);
+const cardEl = () => el('card');
+
+/* ---------- render ---------- */
+function renderDots(){
+  el('dots').innerHTML = XS.map((st,i)=>
+    `<span class="dot ${i===S.cur?'cur':''} ${st.checkedOnce?'done':''}" title="Exercise ${i+1}"></span>`).join('');
+  const done = XS.filter(st=>st.checkedOnce).length;
+  el('fill').style.width = (S.finished ? 100 : done / XS.length * 100) + '%';
+}
+
+function chipHTML(t, extra, id){
+  return `<button type="button" class="chip ${extra}" ${id?`data-id="${id}"`:''} ${extra.includes('locked')||extra.includes('correct')?'disabled':''}>${t}</button>`;
+}
+
+function renderCard(){
+  const ex = RAW[S.cur], st = XS[S.cur];
+  let h = `<div class="card">
+    <div class="badges">
+      <span class="badge b-num">Exercise ${S.cur+1} / ${RAW.length}</span>
+      <span class="badge b-type">${ex.type==='dnd'?'🧲 Drag &amp; drop':'✏️ Fill the gaps'}</span>
+      <span class="badge b-part">${ex.part}</span>
+    </div>
+    <h2 class="instruction">${ex.instruction}</h2>`;
+
+  if(ex.type==='dnd'){
+    h += `<div class="reading">${ex.text}</div>
+      <p class="pool-title">Phrases to place <span class="muted">— drag them, or tap a phrase then tap a column</span></p>
+      <div class="pool" id="pool" data-drop="pool"></div>
+      <div class="grid">` +
+      COLS.map(col=>`
+        <div class="zone col-${col.id}" data-col="${col.id}" data-drop="${col.id}">
+          <div class="zone-head">${col.label}</div>
+          <div class="zone-body" role="button" tabindex="0" aria-label="Column ${col.label} — tap to move the selected phrase here"></div>
+        </div>`).join('') +
+      `</div>`;
+  } else {
+    h += `<ol class="sentences">` + ex.items.map(s=>{
+      const ok = st.okIds.has(s.id);
+      return `<li class="sentence">
+        <span class="letter">${s.letter}</span>
+        <span>${s.before}
+          <select class="gap ${ok?'correct':''}" data-id="${s.id}" ${ok||st.done?'disabled':''} aria-label="Gap ${s.letter}">
+            <option value="?" ${st.vals[s.id]==='?'?'selected':''} hidden>Select</option>
+            <option value=""  ${st.vals[s.id]==='' ?'selected':''}>—</option>
+            <option value="at"${st.vals[s.id]==='at'?'selected':''}>at</option>
+            <option value="on"${st.vals[s.id]==='on'?'selected':''}>on</option>
+            <option value="in" ${st.vals[s.id]==='in' ?'selected':''}>in</option>
+          </select> ${s.after}</span>
+      </li>`;
+    }).join('') + `</ol>`;
+  }
+
+  h += `<div class="feedback" id="fb"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="btnCheck" ${st.done?'disabled':''}>${st.done?'✓ Done':'✓ Check'}</button>
+      <button class="btn btn-ghost hidden" id="btnShow">💡 Show answers</button>
+    </div>
+  </div>`;
+
+  cardEl().innerHTML = h;
+
+  if(ex.type==='dnd') populateDnd(ex, st);
+
+  el('btnCheck').addEventListener('click', checkExercise);
+  el('btnShow').addEventListener('click', revealAnswers);
+
+  if(st.done){
+    const fb = el('fb');
+    fb.className = 'feedback show ' + (st.revealed ? 'info' : 'good');
+    fb.innerHTML = st.revealed
+      ? '💡 Answers were revealed for this exercise.'
+      : '✔️ This exercise is completed.';
+    el('btnShow').classList.add('hidden');
+  } else if(st.checkedOnce){
+    el('btnShow').classList.remove('hidden');
+  }
+
+  renderNav();
+  renderDots();
+}
+
+function populateDnd(ex, st){
+  const poolEl = el('pool');
+  COLS.forEach(col=>{
+    const body = document.querySelector(`.zone[data-col="${col.id}"] .zone-body`);
+    (ex.locked[col.id]||[]).forEach(t=> body.insertAdjacentHTML('beforeend', chipHTML(t,'locked')));
+  });
+  ex.pool.forEach(p=>{
+    const where = st.placed[p.id];
+    const okNow = st.okIds.has(p.id);
+    const html = chipHTML(p.t, okNow?'correct locked':'', p.id);
+    if(where==='pool') poolEl.insertAdjacentHTML('beforeend', html);
+    else document.querySelector(`.zone[data-col="${where}"] .zone-body`).insertAdjacentHTML('beforeend', html);
+  });
+}
+
+function renderNav(){
+  if(S.finished){ el('nav').innerHTML=''; return; }
+  el('nav').innerHTML = `
+    <button class="btn btn-ghost" id="btnPrev" ${S.cur===0?'disabled':''}>← Back</button>
+    <button class="btn btn-primary" id="btnNext" ${XS[S.cur].checkedOnce?'':'disabled'} title="${XS[S.cur].checkedOnce?'':'Check the exercise first'}">
+      ${S.cur===RAW.length-1?'See results 🏁':'Next exercise →'}</button>`;
+  el('btnPrev').addEventListener('click', ()=>{ S.cur--; renderCard(); window.scrollTo({top:0,behavior:'smooth'}); });
+  el('btnNext').addEventListener('click', ()=>{ S.cur===RAW.length-1 ? renderResults() : (S.cur++, renderCard(), window.scrollTo({top:0,behavior:'smooth'})); });
+}
+
+/* ---------- check ---------- */
+function checkExercise(){
+  const ex = RAW[S.cur], st = XS[S.cur];
+
+  if(ex.type==='dnd'){
+    if(ex.pool.some(p=>st.placed[p.id]==='pool')){
+      toast('Put all the phrases into the table first 🙂');
+      el('pool').classList.remove('pulse'); void el('pool').offsetWidth; el('pool').classList.add('pulse');
+      return;
+    }
+    let ok = 0;
+    ex.pool.forEach(p=>{
+      const good = st.placed[p.id]===p.c;
+      const c = cardEl().querySelector(`.chip[data-id="${p.id}"]`);
+      if(good){ ok++; st.okIds.add(p.id); c.classList.add('correct'); c.disabled = true; c.classList.remove('wrong'); }
+      else { c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong'); }
+    });
+    finishCheck(ok, ex.pool.length);
+  } else {
+    const unanswered = ex.items.filter(s=>st.vals[s.id]==='?');
+    if(unanswered.length){
+      toast('Choose an answer in every sentence — “—” means no preposition');
+      unanswered.forEach(s=>{
+        const sel = cardEl().querySelector(`select[data-id="${s.id}"]`);
+        sel.classList.remove('pulse'); void sel.offsetWidth; sel.classList.add('pulse');
+      });
+      return;
+    }
+    let ok = 0;
+    ex.items.forEach(s=>{
+      const good = st.vals[s.id]===s.a;
+      const sel = cardEl().querySelector(`select[data-id="${s.id}"]`);
+      if(good){ ok++; st.okIds.add(s.id); sel.classList.add('correct'); sel.disabled = true; sel.classList.remove('wrong'); }
+      else { sel.classList.remove('wrong'); void sel.offsetWidth; sel.classList.add('wrong'); }
+    });
+    finishCheck(ok, ex.items.length);
+  }
+}
+
+function finishCheck(ok, total){
+  const st = XS[S.cur];
+  if(!st.checkedOnce){ st.checkedOnce = true; st.first = {ok, total}; }
+  const fb = el('fb');
+  if(ok===total){
+    st.done = true;
+    fb.className = 'feedback show good';
+    fb.innerHTML = `🎉 <b>Perfect!</b> ${ok} of ${total} correct.`;
+    el('btnCheck').disabled = true; el('btnCheck').textContent = '✓ Done';
+    el('btnShow').classList.add('hidden');
+    confettiBurst(cardEl().querySelector('.card'));
+  } else {
+    fb.className = 'feedback show partial';
+    fb.innerHTML = `🙂 <b>${ok}</b> of <b>${total}</b> correct. Fix the red ones and check again!`;
+    el('btnShow').classList.remove('hidden');
+  }
+  renderNav(); renderDots();
+}
+
+function revealAnswers(){
+  const ex = RAW[S.cur], st = XS[S.cur];
+  if(ex.type==='dnd'){
+    ex.pool.forEach(p=>{
+      st.okIds.add(p.id); st.placed[p.id] = p.c;
+      const c = cardEl().querySelector(`.chip[data-id="${p.id}"]`);
+      c.classList.remove('wrong'); c.classList.add('correct'); c.disabled = true;
+      document.querySelector(`.zone[data-col="${p.c}"] .zone-body`).appendChild(c);
+    });
+  } else {
+    ex.items.forEach(s=>{
+      st.okIds.add(s.id); st.vals[s.id] = s.a;
+      const sel = cardEl().querySelector(`select[data-id="${s.id}"]`);
+      sel.value = s.a; sel.classList.remove('wrong'); sel.classList.add('correct'); sel.disabled = true;
+    });
+  }
+  st.done = true; st.revealed = true;
+  if(!st.first) st.first = {ok:0, total: ex.pool ? ex.pool.length : ex.items.length};
+  if(!st.checkedOnce){ st.checkedOnce = true; }
+  const fb = el('fb');
+  fb.className = 'feedback show info';
+  fb.innerHTML = '💡 Answers revealed — look carefully and remember the patterns!';
+  el('btnCheck').disabled = true; el('btnCheck').textContent = '✓ Done';
+  el('btnShow').classList.add('hidden');
+  renderNav(); renderDots();
+}
+
+/* ---------- results ---------- */
+function renderResults(){
+  S.finished = true;
+  let ok = 0, total = 0;
+  XS.forEach(st=>{ ok += st.first.ok; total += st.first.total; });
+  const pct = Math.round(ok/total*100);
+  let color, msg, sub;
+  if(pct===100){ color='#059669'; msg='🏆 Perfect!'; sub='You are the master of time prepositions.'; }
+  else if(pct>=80){ color='#059669'; msg='🌟 Great job!'; sub='Just a couple of slips — almost there.'; }
+  else if(pct>=60){ color='#d97706'; msg='👍 Good work!'; sub='Have another look at the tricky ones.'; }
+  else { color='#dc2626'; msg='💪 Keep practising!'; sub='Check the rules for at / on / in and try again.'; }
+
+  cardEl().innerHTML = `<div class="card center">
+    <div class="badges" style="justify-content:center"><span class="badge b-num">Results</span></div>
+    <p class="bigmsg">${msg}</p>
+    <p style="margin:0 0 8px;color:var(--muted);font-weight:700">${sub}</p>
+    <div class="score-ring" style="--p:${pct};--rc:${color}"><div><b>${pct}%</b><span>${ok} / ${total}</span></div></div>
+    <div class="rrows">` +
+    XS.map((st,i)=>{
+      const f = st.first, p = f.ok/f.total;
+      return `<div class="rrow">
+        <span class="rn">${i+1}</span>
+        <span class="rt">${RAW[i].type==='dnd'?'Drag &amp; drop':'Fill the gaps'} · ${RAW[i].part}</span>
+        <span class="rs ${p===1?'all':p>=.5?'some':'low'}">${f.ok}/${f.total}${st.revealed?' 💡':''}</span>
+      </div>`;
+    }).join('') +
+    `</div>
+    <button class="btn btn-primary" id="btnAgain">🔄 Try again</button>
+  </div>`;
+  el('btnAgain').addEventListener('click', ()=>location.reload());
+  renderNav(); renderDots();
+  if(pct>=80) confettiBurst(cardEl().querySelector('.card'));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- drag & drop + tap-to-place ---------- */
+let drag = null, selectedChip = null, lastDrop = 0, suppressClickUntil = 0;
+
+function resolveDrop(el){
+  if(!el) return null;
+  const d = el.closest('[data-drop]');
+  if(!d) return null;
+  if(d.classList.contains('zone')) return d.querySelector('.zone-body');
+  return d;
+}
+
+function selectChip(c){
+  if(selectedChip) selectedChip.classList.remove('selected');
+  selectedChip = c;
+  if(c) c.classList.add('selected');
+}
+
+function placeChip(chip, container){
+  if(!container) return;
+  container.appendChild(chip);
+  chip.classList.remove('wrong');
+  if(selectedChip===chip) selectChip(null);
+  XS[S.cur].placed[chip.dataset.id] = container.dataset.drop || container.closest('.zone')?.dataset.drop || 'pool';
+}
+
+document.addEventListener('pointerdown', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip || chip.disabled || XS[S.cur].done) return;
+  e.preventDefault();
+  const r = chip.getBoundingClientRect();
+  drag = { chip, started:false, x:e.clientX, y:e.clientY,
+           offX:e.clientX-r.left, offY:e.clientY-r.top, from:chip.parentElement };
+});
+
+document.addEventListener('pointermove', e=>{
+  if(!drag) return;
+  if(!drag.started){
+    if(Math.hypot(e.clientX-drag.x, e.clientY-drag.y) < 7) return;
+    drag.started = true;
+    const r = drag.chip.getBoundingClientRect();
+    drag.chip.style.width = r.width+'px';
+    drag.chip.classList.add('dragging');
+    // the card keeps a filled animation transform, which makes position:fixed
+    // resolve against the card — the ghost must live on <body> to track the cursor
+    document.body.appendChild(drag.chip);
+  }
+  drag.chip.style.left = (e.clientX-drag.offX)+'px';
+  drag.chip.style.top  = (e.clientY-drag.offY)+'px';
+  hoverZone(e.clientX, e.clientY);
+});
+
+function hoverZone(x,y){
+  document.querySelectorAll('.dragover').forEach(z=>z.classList.remove('dragover'));
+  const drop = resolveDrop(document.elementFromPoint(x,y));
+  if(drop){
+    const zone = drop.classList.contains('pool') ? drop : drop.closest('.zone');
+    (zone||drop).classList.add('dragover');
+  }
+}
+
+document.addEventListener('pointerup', e=>{
+  if(!drag) return;
+  const {chip, started, from} = drag; drag = null;
+  document.querySelectorAll('.dragover').forEach(z=>z.classList.remove('dragover'));
+  if(!started){ selectChip(selectedChip===chip ? null : chip); return; }
+  lastDrop = Date.now(); suppressClickUntil = lastDrop + 350;
+  chip.classList.remove('dragging');
+  chip.style.left = chip.style.top = chip.style.width = '';
+  placeChip(chip, resolveDrop(document.elementFromPoint(e.clientX, e.clientY)) || from);
+});
+
+document.addEventListener('pointercancel', ()=>{
+  if(!drag) return;
+  const {chip, from} = drag; drag = null;
+  document.querySelectorAll('.dragover').forEach(z=>z.classList.remove('dragover'));
+  chip.classList.remove('dragging');
+  chip.style.left = chip.style.top = chip.style.width = '';
+  placeChip(chip, from);
+});
+
+document.addEventListener('click', e=>{
+  if(Date.now() < suppressClickUntil) return;
+  const chipEl2 = e.target.closest('.chip');
+  if(chipEl2 && !chipEl2.disabled){
+    // pointer taps are handled in pointerup; e.detail===0 means keyboard activation
+    if(e.detail === 0) selectChip(selectedChip===chipEl2 ? null : chipEl2);
+    return;
+  }
+  // taps on locked chips fall through and act as a tap on their column
+  if(!selectedChip) return;
+  const drop = resolveDrop(e.target);
+  if(drop){ placeChip(selectedChip, drop); }
+});
+
+document.addEventListener('keydown', e=>{
+  if((e.key==='Enter'||e.key===' ') && e.target.matches('.zone-body') && selectedChip){
+    e.preventDefault();
+    placeChip(selectedChip, e.target);
+  }
+});
+
+document.addEventListener('change', e=>{
+  const sel = e.target.closest('select.gap');
+  if(!sel) return;
+  XS[S.cur].vals[sel.dataset.id] = sel.value;
+  sel.classList.remove('wrong','pulse');
+});
+
+/* ---------- fx ---------- */
+function toast(msg){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .3s'; }, 2100);
+  setTimeout(()=>t.remove(), 2450);
+}
+
+function confettiBurst(host){
+  if(!host) return;
+  const emo = ['🎉','✨','⭐','🎊','💫'];
+  for(let k=0;k<26;k++){
+    const s = document.createElement('span');
+    s.className = 'confetti';
+    s.textContent = emo[k % emo.length];
+    s.style.left = (4 + Math.random()*92) + '%';
+    host.appendChild(s);
+    const dy = host.clientHeight*0.55 + Math.random()*140;
+    s.animate(
+      [{transform:'translateY(0) rotate(0deg)', opacity:1},
+       {transform:`translateY(${dy}px) rotate(${Math.round(Math.random()*540-270)}deg)`, opacity:0}],
+      {duration: 950 + Math.random()*900, easing:'cubic-bezier(.2,.6,.4,1)'}
+    ).onfinish = ()=>s.remove();
+  }
+}
+
+/* ---------- init ---------- */
+renderCard();
+</script>
+</body>
+</html>
