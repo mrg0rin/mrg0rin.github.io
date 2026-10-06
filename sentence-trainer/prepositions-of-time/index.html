@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тренажёр: Prepositions of Time</title>
+<style>
+    /* ===== АКЦЕНТНЫЙ ЦВЕТ ТРЕНАЖЁРА — меняется здесь ===== */
+    :root {
+        --accent: #2f8f6f;          /* изумрудный */
+        --accent-dark: #257459;
+        --accent-soft: #e6f4ee;
+        --bg1: #f6f8f7;
+        --bg2: #e9efec;
+        --ink: #26332e;
+        --muted: #6b7a74;
+        --rank0: #e05a4e;           /* красный — провален */
+        --rank1: #ef8b3d;           /* оранжевый — слабый */
+        --rank2: #f2c14e;           /* жёлтый — в работе */
+        --rank3: #3da67a;           /* зелёный — освоен */
+    }
+
+    * { box-sizing: border-box; }
+    body {
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        min-height: 100vh; margin: 0; padding: 16px 14px;
+        font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(160deg, var(--bg1), var(--bg2));
+        color: var(--ink);
+    }
+    #app {
+        width: 100%; max-width: 720px;
+        background: #fff; padding: 30px 32px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(38, 51, 46, 0.10);
+    }
+    button {
+        font-family: inherit; cursor: pointer;
+        border: none; border-radius: 10px;
+        transition: transform .08s ease, background .15s ease, box-shadow .15s ease;
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    button:active { transform: scale(0.96); }
+
+    /* ---------- стартовый и финальный экраны ---------- */
+    .center-screen { text-align: center; padding: 24px 8px; }
+    .center-screen h1 { font-size: 30px; margin: 0 0 12px; font-weight: 700; color: var(--accent-dark); }
+    .center-screen p { font-size: 19px; color: var(--muted); line-height: 1.55; margin: 8px 0 26px; }
+    .btn-accent {
+        padding: 14px 38px; font-size: 21px; font-weight: 600;
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(47, 143, 111, 0.35);
+    }
+    .btn-accent:hover { filter: brightness(1.08); }
+    .btn-ghost {
+        padding: 10px 20px; font-size: 17px;
+        background: transparent; color: var(--muted);
+        border: 2px solid #d8e0dc;
+    }
+    .btn-ghost:hover { background: #f2f6f4; color: var(--ink); }
+    #stats { font-size: 21px; line-height: 2; margin-bottom: 26px; }
+    #stats b { color: var(--accent-dark); }
+
+    /* ---------- шапка упражнения ---------- */
+    #ex-header { margin-bottom: 14px; text-align: center; }
+    #ex-title { font-size: 15px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+    /* лента рангов */
+    #rank-strip { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+    .rank-dot {
+        width: 26px; height: 26px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 700; color: #fff;
+        transition: background .3s ease, transform .2s ease, box-shadow .2s ease;
+    }
+    .rank-dot.r2 { color: #6b5518; }
+    .rank-dot.r0 { background: var(--rank0); }
+    .rank-dot.r1 { background: var(--rank1); }
+    .rank-dot.r2 { background: var(--rank2); }
+    .rank-dot.r3 { background: var(--rank3); }
+    .rank-dot.active { transform: scale(1.25); box-shadow: 0 0 0 3px rgba(38,51,46,.18); }
+
+    /* ---------- область сборки ---------- */
+    #builder {
+        min-height: 92px;
+        font-size: 26px; line-height: 1.5;
+        background: #f7faf9; border: 2px solid #dde7e2; border-radius: 14px;
+        padding: 16px 18px; margin: 18px 0;
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px;
+        transition: background .3s ease, border-color .3s ease;
+    }
+    #builder .placeholder { color: #a4b3ad; font-size: 19px; }
+    #builder.ok { background: var(--accent-soft); border-color: var(--accent); }
+    .chip {
+        padding: 7px 16px; border-radius: 10px;
+        background: var(--accent-soft); border: 2px solid #bcd9cd;
+        cursor: pointer; font-size: 24px; color: var(--ink);
+        transition: background .15s ease;
+    }
+    .chip:hover { background: #d3eade; }
+    .checkmark { color: var(--accent); font-weight: 700; margin-left: 4px; }
+
+    /* ---------- пул слов ---------- */
+    #pool {
+        display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+        min-height: 62px; margin-bottom: 16px;
+    }
+    .word-btn {
+        padding: 13px 24px; font-size: 23px;
+        background: #fff; border: 2px solid #cfdad5; color: var(--ink);
+        box-shadow: 0 2px 5px rgba(38,51,46,.07);
+    }
+    .word-btn:hover { background: #f0f6f3; border-color: #a9c4b9; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(38,51,46,.12); }
+    .word-btn.shake {
+        animation: shake .35s ease;
+        background: #fdeceb; border-color: var(--rank0); color: var(--rank0);
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-6px); }
+        40% { transform: translateX(6px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+    }
+
+    /* ---------- подсказка и обратная связь ---------- */
+    #ex-footer { display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 40px; }
+    #feedback { font-size: 18px; line-height: 1.45; text-align: center; }
+
+    /* ---------- сброс прогресса и модальный диалог ---------- */
+    #reset-link {
+        display: block; text-align: center; margin-top: 18px;
+        font-size: 15px; color: var(--muted);
+    }
+    #reset-link[hidden] { display: none; }
+    #reset-link:hover { color: var(--accent-dark); }
+    #modal-overlay {
+        position: fixed; inset: 0; z-index: 10;
+        background: rgba(38, 51, 46, 0.45);
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px;
+    }
+    #modal-overlay[hidden] { display: none; }
+    #modal {
+        background: #fff; border-radius: 18px; padding: 28px 30px;
+        max-width: 380px; text-align: center;
+        box-shadow: 0 10px 30px rgba(38, 51, 46, 0.25);
+    }
+    #modal p { font-size: 20px; margin: 0 0 6px; }
+    #modal small { font-size: 16px; color: var(--muted); line-height: 1.5; display: block; }
+    #modal .modal-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 22px; }
+    #modal .btn-accent { padding: 11px 26px; font-size: 18px; }
+    #modal .btn-ghost { padding: 11px 22px; font-size: 18px; }
+    #feedback .ok-text { color: var(--accent-dark); font-weight: 700; }
+    #feedback .hint-text { color: var(--muted); }
+
+    @media (max-width: 560px) {
+        #app { padding: 22px 14px; }
+        #builder { font-size: 22px; min-height: 96px; }
+        .chip { font-size: 20px; padding: 8px 16px; }
+        .word-btn { font-size: 20px; padding: 13px 20px; }
+        .rank-dot { width: 24px; height: 24px; font-size: 11px; border-radius: 7px; }
+    }
+</style>
+</head>
+<body>
+<div id="app">
+    <div id="screen-start" class="center-screen">
+        <h1 id="start-title"></h1>
+        <p id="start-instruction"></p>
+        <button id="btn-start" class="btn-accent">Начать</button>
+    </div>
+
+    <div id="screen-ex" hidden>
+        <div id="ex-header">
+            <div id="ex-title"></div>
+            <div id="rank-strip"></div>
+        </div>
+        <div id="builder"></div>
+        <div id="pool"></div>
+        <div id="ex-footer">
+            <button id="btn-hint" class="btn-ghost">Подсказка</button>
+            <div id="feedback"></div>
+        </div>
+    </div>
+
+    <div id="screen-end" class="center-screen" hidden>
+        <h1>Готово!</h1>
+        <div id="stats"></div>
+        <button id="btn-restart" class="btn-accent">Пройти ещё раз</button>
+    </div>
+</div>
+<a href="#" id="reset-link" hidden>Сбросить прогресс</a>
+
+<div id="modal-overlay" hidden>
+    <div id="modal">
+        <p>Сбросить прогресс?</p>
+        <small>Все квадратики снова станут жёлтыми, счётчик ошибок и таймер обнулятся.</small>
+        <div class="modal-buttons">
+            <button id="btn-cancel" class="btn-ghost">Отмена</button>
+            <button id="btn-confirm-reset" class="btn-accent">Сбросить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ======================================================================
+   ДАННЫЕ УРОКА — правится только этот блок, код ниже трогать не нужно.
+   ----------------------------------------------------------------------
+   Формат предложения (одна строка = одно предложение):
+
+     "Текст предложения. || Подсказка"
+
+   Разметка внутри текста:
+     {at|in|on}      — точка выбора; ПЕРВЫЙ вариант правильный,
+                       остальные — кнопки-ловушки;
+     {at|+on|in}     — несколько правильных вариантов: первый
+                       и все с «+» (здесь at и on — правильные);
+     {in the summer|+in summer|on the summer}
+                     — варианты могут состоять из нескольких слов;
+     {0|a|the}       — нулевой вариант: правильный ответ — НИЧЕГО
+                       не вставлять (в речи никаких прочерков нет).
+                       Кнопка для нуля не создаётся, a и the —
+                       ловушки; тренажёр ждёт следующее слово;
+     {0|+the}        — необязательное слово: правильно и «the»,
+                       и его отсутствие (слово можно пропустить);
+     [Tom and Mary]  — кусок из нескольких слов, одна кнопка;
+     || подсказка    — необязательно; показывается по кнопке
+                       «Подсказка» и после чистой сборки.
+
+   Настройки:
+     SHOW_CAPITAL: true — первое слово показано с большой буквы (легче);
+                   false — первое слово показано со строчной (сложнее).
+                   Регистр букв всегда значим: кнопка «the» не встанет
+                   на место «The» и наоборот.
+   ====================================================================== */
+
+const LESSON_TITLE = 'Prepositions of Time: at / on / in';
+const LESSON_INSTRUCTION = 'Собирайте предложения, нажимая на кнопки со словами. ' +
+    'Каждое предложение обозначено квадратиком. ' +
+    'Упражнение считается выполненным, когда все квадратики становятся зелёными.';
+const SHOW_CAPITAL = true;
+
+const SENTENCES = [
+    "I get up {at|in|on} 7 o'clock. || Точное время → at (at 7 o'clock, at 9 a.m.)",
+    "The shops are closed {at|in|on} night. || Исключение: at night",
+    "We are at home {at|+on|in} the weekend. || at the weekend (брит.) / on the weekend (амер.)",
+    "We play tennis {on|in|at} Friday. || Дни недели → on",
+    "The meeting is {on|at|in} the 25th of October. || Даты → on",
+    "The party is {on|at|in} my birthday. || on my birthday",
+    "We are having a barbecue {on|at|in} Saturday evening. || День + часть суток → on (on Friday evening)",
+    "My family moved here {in|on|at} 2020. || Годы → in",
+    "We watch TV {in|at|on} the evening. || in the morning / afternoon / evening",
+    "We go to the sea {in|at|on} {0|+the} summer. || Времена года → in; артикль the необязателен",
+    "My birthday is {in|on|at} June. || Месяцы → in",
+    "I usually drink tea {in|at|on} the afternoon. || in the morning / afternoon / evening",
+    "Let's go to the cinema {0|on|at|in} this week. || this / last / next → без предлога",
+    "I am very busy {0|at|in|on} this year. || this / last / next → без предлога",
+    "We bought this house {0|in|at|on} last year. || this / last / next → без предлога",
+    "See you {0|at|in|on} next month! || this / last / next → без предлога"
+];
+
+/* ===================== КОД ДВИЖКА — НИЖЕ НИЧЕГО МЕНЯТЬ ===================== */
+
+/* ---------- утилиты ---------- */
+
+const $ = id => document.getElementById(id);
+
+function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+/* ---------- разбор строки предложения ---------- */
+
+// "We play {on|in} [tennis matches]. || подсказка" -> { tokens: [...], hint }
+// token: { answer, options: [..] | null }
+function parseLine(line) {
+    const parts = line.split('||');
+    const text = parts[0].trim();
+    const hint = parts[1] ? parts[1].trim() : null;
+
+    const tokens = [];
+    const pushWords = str => {
+        str.split(/\s+/).filter(Boolean).forEach(w => tokens.push({ answer: w, correct: [w], options: null }));
+    };
+    const re = /(\{[^}]+\}|\[[^\]]+\])/g;
+    let last = 0, m;
+    while ((m = re.exec(text)) !== null) {
+        pushWords(text.slice(last, m.index));
+        const raw = m[0];
+        if (raw[0] === '{') {
+            const rawOpts = raw.slice(1, -1).split('|').map(s => s.trim());
+            if (rawOpts[0] === '0') {
+                // нулевая точка: сами по себе варианты — ловушки,
+                // но варианты с «+» — необязательные правильные слова
+                const rest = rawOpts.slice(1);
+                const labels = rest.map(o => o.replace(/^\+/, ''));
+                const correct = rest.filter(o => o.startsWith('+')).map(o => o.slice(1));
+                if (correct.length) {
+                    tokens.push({ answer: correct[0], correct, options: labels, optional: true });
+                } else {
+                    tokens.push({ answer: null, options: labels, zero: true });
+                }
+            } else {
+                // «+» в начале варианта = тоже правильный ответ
+                const labels = rawOpts.map(o => o.replace(/^\+/, ''));
+                const correct = labels.filter((o, i) => i === 0 || rawOpts[i].startsWith('+'));
+                tokens.push({ answer: labels[0], correct, options: labels });
+            }
+        } else {
+            const w = raw.slice(1, -1).replace(/\s+/g, ' ').trim();
+            tokens.push({ answer: w, correct: [w], options: null });
+        }
+        last = re.lastIndex;
+    }
+    pushWords(text.slice(last));
+    return { tokens, hint };
+}
+
+/* ---------- машина рангов ---------- */
+/* Ранги: 0 красный, 1 оранжевый, 2 жёлтый (старт), 3 зелёный (освоен).
+   Чистая сборка (ноль ошибок за попытку) → +1.
+   Ошибка → −1 немедленно, но не чаще одного раза за попытку;
+   каждая ошибка идёт в счётчик ошибок. */
+
+const RANK_START = 2;
+const RANK_MAX = 3;
+
+const items = SENTENCES.map(line => {
+    const parsed = parseLine(line);
+    return {
+        ...parsed,
+        real: parsed.tokens.filter(t => !t.zero), // реальная последовательность слов
+        rank: RANK_START,
+        errors: 0,
+        shakes: 0,      // ошибки в текущей попытке
+        dropped: false  // ранг уже понижен в этой попытке
+    };
+});
+
+function rankUp(i)   { items[i].rank = Math.min(RANK_MAX, items[i].rank + 1); updateStrip(); }
+function rankDown(i) { items[i].rank = Math.max(0, items[i].rank - 1); updateStrip(); }
+
+// следующее предложение: самое слабое; среди равных — случайное
+function pickNext() {
+    const alive = items.map((it, i) => i).filter(i => items[i].rank < RANK_MAX);
+    if (!alive.length) return -1;
+    const minRank = Math.min(...alive.map(i => items[i].rank));
+    let pool = alive.filter(i => items[i].rank === minRank);
+    if (pool.length > 1) pool = pool.filter(i => i !== state.current);
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/* ---------- состояние ---------- */
+
+const state = {
+    current: -1,
+    built: [],        // [{ label, btn }] или скрытые маркеры { hidden: true }
+    locked: false,    // предложение собрано, идёт пауза
+    totalShakes: 0,
+    startTime: null,  // таймер — от первого нажатия на слово
+    elapsedBase: 0,   // накопленное время из сохранённых сессий
+    runId: 0          // защита от «хвостов» таймеров при сбросе
+};
+
+/* ---------- сохранение прогресса (localStorage, TTL 24 часа) ---------- */
+
+const STORAGE_KEY = 'sentenceTrainer:' + LESSON_TITLE;
+const STORAGE_TTL = 24 * 3600 * 1000;
+
+function currentElapsed() {
+    return state.elapsedBase + (state.startTime ? Date.now() - state.startTime : 0);
+}
+
+function saveState(finished) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            ts: Date.now(),
+            finished: !!finished,
+            ranks: items.map(it => it.rank),
+            errors: items.map(it => it.errors),
+            totalShakes: state.totalShakes,
+            elapsed: currentElapsed()
+        }));
+    } catch (e) { /* приватный режим и т.п. — просто не сохраняем */ }
+}
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const s = JSON.parse(raw);
+        if (!s || Date.now() - s.ts > STORAGE_TTL) {
+            localStorage.removeItem(STORAGE_KEY);
+            return null;
+        }
+        if (!Array.isArray(s.ranks) || s.ranks.length !== items.length) return null;
+        return s;
+    } catch (e) { return null; }
+}
+
+/* ---------- лента рангов ---------- */
+
+function buildStrip() {
+    const strip = $('rank-strip');
+    strip.innerHTML = '';
+    items.forEach((it, i) => {
+        const d = document.createElement('div');
+        d.className = 'rank-dot r' + it.rank;
+        d.textContent = i + 1;
+        d.dataset.idx = i;
+        strip.appendChild(d);
+    });
+}
+
+function updateStrip() {
+    [...$('rank-strip').children].forEach((d, i) => {
+        d.className = 'rank-dot r' + items[i].rank + (i === state.current ? ' active' : '');
+    });
+    saveState(false);
+}
+
+/* ---------- отображаемое написание слова ---------- */
+/* Регистр значим: кнопка «the» не встанет на место «The».
+   При SHOW_CAPITAL = false первое слово и кнопка, и эталон —
+   со строчной буквы. */
+function dispLabel(s, realIdx) {
+    return (realIdx === 0 && !SHOW_CAPITAL) ? s.charAt(0).toLowerCase() + s.slice(1) : s;
+}
+
+/* ---------- экран упражнения ---------- */
+
+function renderSentence(idx) {
+    state.current = idx;
+    state.built = [];
+    state.locked = false;
+    const it = items[idx];
+    it.shakes = 0;
+    it.dropped = false;
+
+    $('feedback').innerHTML = '';
+    $('btn-hint').style.visibility = it.hint ? 'visible' : 'hidden';
+    $('btn-hint').disabled = false;
+
+    const builder = $('builder');
+    builder.classList.remove('ok');
+    builder.innerHTML = '<span class="placeholder">Нажимайте на слова внизу, чтобы собрать предложение…</span>';
+
+    // пул: слова и варианты-ловушки
+    const pool = $('pool');
+    pool.innerHTML = '';
+    const buttons = [];
+    let realIdx = 0;
+    it.tokens.forEach(t => {
+        if (t.options) {
+            // варианты выбора и ловушки (у нулевого варианта — только ловушки)
+            t.options.forEach(opt => buttons.push({ label: dispLabel(opt, realIdx) }));
+        } else {
+            buttons.push({ label: dispLabel(t.answer, realIdx) });
+        }
+        if (!t.zero) realIdx++;
+    });
+    shuffle(buttons).forEach(({ label }) => {
+        const b = document.createElement('button');
+        b.className = 'word-btn';
+        b.textContent = label;
+        b.addEventListener('click', () => pickWord(label, b));
+        pool.appendChild(b);
+    });
+
+    updateStrip();
+}
+
+function pickWord(label, btn) {
+    if (state.locked) return;
+    if (state.startTime === null) state.startTime = Date.now(); // таймер — с первого действия
+    const it = items[state.current];
+    const real = it.real;
+    const pos = state.built.length;
+    const expected = real[pos];
+    if (!expected) return;
+    const hit = (t, idx) => t && t.correct && t.correct.some(a => dispLabel(a, idx) === label);
+
+    if (hit(expected, pos)) {
+        btn.style.display = 'none';
+        addChip(label, btn);
+    } else if (expected.optional && hit(real[pos + 1], pos + 1)) {
+        // ученик пропустил необязательное слово — это правильно
+        btn.style.display = 'none';
+        state.built.push({ hidden: true }); // невидимый маркер на месте пропуска
+        addChip(label, btn);
+    } else {
+        btn.classList.remove('shake');
+        void btn.offsetWidth; // перезапуск анимации
+        btn.classList.add('shake');
+        it.shakes++; it.errors++; state.totalShakes++;
+        if (!it.dropped) { it.dropped = true; rankDown(state.current); }
+        return;
+    }
+    if (state.built.length === real.length) completeSentence();
+}
+
+function addChip(label, btn) {
+    state.built.push({ label, btn });
+    redrawBuilder();
+}
+
+function removeFrom(pos) {
+    if (state.locked) return;
+    const removed = state.built.splice(pos);
+    removed.forEach(({ btn }) => { if (btn) btn.style.display = ''; });
+    redrawBuilder();
+}
+
+function redrawBuilder() {
+    const builder = $('builder');
+    builder.innerHTML = '';
+    if (!state.built.some(item => !item.hidden)) {
+        builder.innerHTML = '<span class="placeholder">Нажимайте на слова внизу, чтобы собрать предложение…</span>';
+        return;
+    }
+    state.built.forEach((item, pos) => {
+        if (item.hidden) return;
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.textContent = item.label;
+        chip.title = 'Нажмите, чтобы убрать';
+        chip.addEventListener('click', () => removeFrom(pos));
+        builder.appendChild(chip);
+    });
+}
+
+function completeSentence() {
+    state.locked = true;
+    const it = items[state.current];
+    const clean = it.shakes === 0;
+    if (clean) rankUp(state.current);
+
+    $('builder').classList.add('ok');
+    const mark = document.createElement('span');
+    mark.className = 'checkmark';
+    mark.textContent = '✓';
+    $('builder').appendChild(mark);
+    $('pool').querySelectorAll('button').forEach(b => b.disabled = true);
+    $('btn-hint').disabled = true;
+
+    const fb = $('feedback');
+    fb.innerHTML = clean ? '<span class="ok-text">Верно!</span> ' : '<span class="ok-text">Собрано.</span> ';
+    if (it.hint) {
+        const h = document.createElement('span');
+        h.className = 'hint-text';
+        h.textContent = it.hint;
+        fb.appendChild(h);
+    }
+
+    const run = state.runId;
+    setTimeout(() => {
+        if (run !== state.runId) return; // был сброс или перезапуск
+        const next = pickNext();
+        if (next === -1) endLesson();
+        else renderSentence(next);
+    }, 2200);
+}
+
+/* ---------- запуск и финиш ---------- */
+
+function startLesson() {
+    state.runId++;
+    items.forEach(it => { it.rank = RANK_START; it.errors = 0; });
+    state.totalShakes = 0;
+    state.startTime = null; // таймер запустится с первого нажатия на слово
+    state.elapsedBase = 0;
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    $('ex-title').textContent = LESSON_TITLE;
+    buildStrip();
+    showScreen('ex');
+    // первое предложение — случайное
+    renderSentence(Math.floor(Math.random() * items.length));
+}
+
+function showEnd(perfect, totalShakes, secs) {
+    const mm = Math.floor(secs / 60), ss = String(secs % 60).padStart(2, '0');
+    $('stats').innerHTML =
+        `Предложений освоено: <b>${items.length}</b><br>` +
+        `Без единой ошибки: <b>${perfect} из ${items.length}</b><br>` +
+        `Всего ошибок: <b>${totalShakes}</b><br>` +
+        `Время выполнения: <b>${mm}:${ss}</b>`;
+    showScreen('end');
+}
+
+function endLesson() {
+    const secs = Math.round(currentElapsed() / 1000);
+    const perfect = items.filter(it => it.errors === 0).length;
+    saveState(true);
+    showEnd(perfect, state.totalShakes, secs);
+}
+
+function showScreen(name) {
+    ['start', 'ex', 'end'].forEach(n => $('screen-' + n).hidden = (n !== name));
+    // ссылка «Сброс» — только на экране упражнения
+    $('reset-link').hidden = (name !== 'ex');
+}
+
+/* ---------- инициализация ---------- */
+
+$('start-title').textContent = LESSON_TITLE;
+$('start-instruction').innerHTML = LESSON_INSTRUCTION +
+    '<br>Предложений в уроке: ' + SENTENCES.length + '.';
+$('btn-start').addEventListener('click', startLesson);
+$('btn-restart').addEventListener('click', startLesson);
+$('btn-hint').addEventListener('click', () => {
+    const it = items[state.current];
+    if (it && it.hint) {
+        $('feedback').innerHTML = '';
+        const h = document.createElement('span');
+        h.className = 'hint-text';
+        h.textContent = 'Подсказка: ' + it.hint;
+        $('feedback').appendChild(h);
+    }
+});
+
+/* ---------- сброс прогресса ---------- */
+
+$('reset-link').addEventListener('click', e => {
+    e.preventDefault();
+    $('modal-overlay').hidden = false;
+});
+$('btn-cancel').addEventListener('click', () => { $('modal-overlay').hidden = true; });
+$('modal-overlay').addEventListener('click', e => {
+    if (e.target === $('modal-overlay')) $('modal-overlay').hidden = true;
+});
+$('btn-confirm-reset').addEventListener('click', () => {
+    $('modal-overlay').hidden = true;
+    state.runId++; // гасим отложенный переход, если сброс во время паузы
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    items.forEach(it => { it.rank = RANK_START; it.errors = 0; });
+    state.totalShakes = 0;
+    state.elapsedBase = 0;
+    state.startTime = null;
+    showScreen('start');
+});
+
+/* ---------- восстановление прогресса при открытии ---------- */
+
+const saved = loadState();
+if (saved && saved.finished) {
+    // тренажёр уже пройден — показываем финальный экран со статистикой
+    const errors = Array.isArray(saved.errors) ? saved.errors : items.map(() => 0);
+    const perfect = errors.filter(e => e === 0).length;
+    showEnd(perfect, saved.totalShakes || 0, Math.round((saved.elapsed || 0) / 1000));
+} else if (saved) {
+    saved.ranks.forEach((r, i) => { items[i].rank = r; });
+    if (Array.isArray(saved.errors)) saved.errors.forEach((e, i) => { items[i].errors = e; });
+    state.totalShakes = saved.totalShakes || 0;
+    state.elapsedBase = saved.elapsed || 0;
+    $('ex-title').textContent = LESSON_TITLE;
+    buildStrip();
+    showScreen('ex');
+    renderSentence(pickNext());
+}
+</script>
+</body>
+</html>
